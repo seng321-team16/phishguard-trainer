@@ -1,0 +1,514 @@
+openapi: 3.1.0
+info:
+  title: PhishGuard Trainer API
+  version: 0.1.0
+  summary: REST contract for a phishing-awareness simulator (no real email is ever sent).
+  description: |
+    Learners practise judging fake emails and receive feedback. Admins manage scenarios.
+    Security notes: bearer-token auth, role checks on every operation, strict input validation,
+    and rate limiting (HTTP 429 with Retry-After). The scenario answer key is withheld until
+    an answer is submitted.
+  license:
+    name: Apache 2.0
+    identifier: Apache-2.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local docker-compose
+tags:
+  - name: Auth
+  - name: Training
+  - name: Results
+  - name: Admin
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: registerUser
+      summary: Create a learner account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+            example: { username: ali, email: ali@example.com, password: "correct-horse-battery-staple" }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Exchange credentials for an access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      summary: Current user profile
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /sessions:
+    post:
+      tags: [Training]
+      operationId: startSession
+      summary: Start a training session with a random set of scenarios
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                scenarioCount: { type: integer, minimum: 1, maximum: 20, default: 10 }
+                difficulty: { $ref: '#/components/schemas/Difficulty' }
+      responses:
+        '201':
+          description: Session started. Scenarios contain no answer key.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422':
+          description: Not enough scenarios available for the request
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+  /sessions/{sessionId}/answers:
+    post:
+      tags: [Training]
+      operationId: submitAnswer
+      summary: Submit a verdict for one scenario and receive feedback
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnswerRequest' }
+            example: { scenarioId: 3f6c7a52-1b8e-4d0b-9a3e-2f9d7c1a5b10, verdict: phishing, flaggedIndicators: [sender_domain_mismatch, urgent_language] }
+      responses:
+        '200':
+          description: Feedback for this scenario
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnswerFeedback' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Scenario already answered or session already completed
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /sessions/{sessionId}/complete:
+    post:
+      tags: [Training]
+      operationId: completeSession
+      summary: Finish the session and get the final score
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Final result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Session already completed
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /me/results:
+    get:
+      tags: [Results]
+      operationId: listMyResults
+      summary: Score history of the current user (newest first)
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: Completed sessions of the caller only
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/SessionResult' }
+                  total: { type: integer, minimum: 0 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /admin/scenarios:
+    get:
+      tags: [Admin]
+      operationId: adminListScenarios
+      summary: List all scenarios including answer keys (admin only)
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: Scenarios
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AdminScenario' }
+                  total: { type: integer, minimum: 0 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Admin]
+      operationId: adminCreateScenario
+      summary: Create a scenario (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScenarioInput' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminScenario' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/scenarios/{scenarioId}:
+    parameters:
+      - $ref: '#/components/parameters/ScenarioId'
+    get:
+      tags: [Admin]
+      operationId: adminGetScenario
+      summary: Get one scenario with answer key (admin only)
+      responses:
+        '200':
+          description: Scenario
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminScenario' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Admin]
+      operationId: adminUpdateScenario
+      summary: Replace a scenario (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScenarioInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminScenario' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Admin]
+      operationId: adminDeleteScenario
+      summary: Delete a scenario (admin only)
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /admin/stats:
+    get:
+      tags: [Admin]
+      operationId: adminGetStats
+      summary: Aggregate statistics (admin only)
+      responses:
+        '200':
+          description: Aggregates only, no per-user answer detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Stats' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    SessionId:
+      in: path
+      name: sessionId
+      required: true
+      schema: { type: string, format: uuid }
+    ScenarioId:
+      in: path
+      name: scenarioId
+      required: true
+      schema: { type: string, format: uuid }
+    Limit:
+      in: query
+      name: limit
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Offset:
+      in: query
+      name: offset
+      schema: { type: integer, minimum: 0, default: 0 }
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Bad Request, status: 400, detail: "password must be at least 12 characters" }
+    Unauthorized:
+      description: Missing, expired or invalid credentials
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Authenticated but not allowed (wrong role or not the resource owner)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Resource does not exist (or is not visible to the caller)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Resource already exists
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds until the caller may retry
+          schema: { type: integer, minimum: 0 }
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    Problem:
+      type: object
+      required: [title, status]
+      properties:
+        type: { type: string, default: "about:blank" }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+    Role:
+      type: string
+      enum: [learner, admin]
+    Difficulty:
+      type: string
+      enum: [easy, medium, hard]
+    Verdict:
+      type: string
+      enum: [phishing, legitimate]
+    IndicatorCode:
+      type: string
+      description: Controlled vocabulary of red flags.
+      enum:
+        - sender_domain_mismatch
+        - urgent_language
+        - suspicious_link
+        - credential_request
+        - unexpected_attachment
+        - generic_greeting
+        - spelling_grammar
+        - too_good_to_be_true
+        - mismatched_reply_to
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required: [username, email, password]
+      properties:
+        username: { type: string, minLength: 3, maxLength: 32, pattern: '^[A-Za-z0-9_.-]+$' }
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 12, maxLength: 128, writeOnly: true }
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [username, password]
+      properties:
+        username: { type: string, maxLength: 254 }
+        password: { type: string, maxLength: 128, writeOnly: true }
+    TokenResponse:
+      type: object
+      required: [accessToken, tokenType, expiresIn]
+      properties:
+        accessToken: { type: string }
+        tokenType: { type: string, enum: [Bearer] }
+        expiresIn: { type: integer, description: Lifetime in seconds, example: 3600 }
+    User:
+      type: object
+      required: [id, username, email, role, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        email: { type: string, format: email }
+        role: { $ref: '#/components/schemas/Role' }
+        createdAt: { type: string, format: date-time }
+    ScenarioPublic:
+      type: object
+      description: What a learner sees. No answer key. Body is plain text; clients must render it escaped.
+      required: [id, subject, senderName, senderAddress, body]
+      properties:
+        id: { type: string, format: uuid }
+        subject: { type: string, maxLength: 200 }
+        senderName: { type: string, maxLength: 100 }
+        senderAddress: { type: string, maxLength: 254, example: support@examp1e-bank.test }
+        replyTo: { type: string, maxLength: 254 }
+        body: { type: string, maxLength: 5000 }
+        displayedLinks:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            required: [label, target]
+            properties:
+              label: { type: string, maxLength: 200 }
+              target: { type: string, maxLength: 500, description: "Shown as text only, never as a clickable link" }
+    ScenarioInput:
+      type: object
+      additionalProperties: false
+      required: [subject, senderName, senderAddress, body, isPhishing, difficulty, explanation]
+      properties:
+        subject: { type: string, minLength: 1, maxLength: 200 }
+        senderName: { type: string, minLength: 1, maxLength: 100 }
+        senderAddress: { type: string, minLength: 3, maxLength: 254 }
+        replyTo: { type: string, maxLength: 254 }
+        body: { type: string, minLength: 1, maxLength: 5000 }
+        displayedLinks:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            required: [label, target]
+            additionalProperties: false
+            properties:
+              label: { type: string, maxLength: 200 }
+              target: { type: string, maxLength: 500 }
+        isPhishing: { type: boolean }
+        indicators:
+          type: array
+          items: { $ref: '#/components/schemas/IndicatorCode' }
+          uniqueItems: true
+        difficulty: { $ref: '#/components/schemas/Difficulty' }
+        explanation: { type: string, minLength: 1, maxLength: 2000 }
+    AdminScenario:
+      allOf:
+        - $ref: '#/components/schemas/ScenarioInput'
+        - type: object
+          required: [id, createdAt, createdBy]
+          properties:
+            id: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+            createdBy: { type: string, format: uuid }
+    Session:
+      type: object
+      required: [id, startedAt, scenarios]
+      properties:
+        id: { type: string, format: uuid }
+        startedAt: { type: string, format: date-time }
+        scenarios:
+          type: array
+          items: { $ref: '#/components/schemas/ScenarioPublic' }
+    AnswerRequest:
+      type: object
+      additionalProperties: false
+      required: [scenarioId, verdict]
+      properties:
+        scenarioId: { type: string, format: uuid }
+        verdict: { $ref: '#/components/schemas/Verdict' }
+        flaggedIndicators:
+          type: array
+          maxItems: 9
+          uniqueItems: true
+          items: { $ref: '#/components/schemas/IndicatorCode' }
+    AnswerFeedback:
+      type: object
+      required: [correct, correctVerdict, explanation, pointsAwarded]
+      properties:
+        correct: { type: boolean }
+        correctVerdict: { $ref: '#/components/schemas/Verdict' }
+        correctIndicators:
+          type: array
+          items: { $ref: '#/components/schemas/IndicatorCode' }
+        missedIndicators:
+          type: array
+          items: { $ref: '#/components/schemas/IndicatorCode' }
+        explanation: { type: string }
+        pointsAwarded: { type: integer, minimum: 0 }
+    SessionResult:
+      type: object
+      required: [sessionId, completedAt, totalScenarios, correctCount, score]
+      properties:
+        sessionId: { type: string, format: uuid }
+        completedAt: { type: string, format: date-time }
+        totalScenarios: { type: integer, minimum: 1 }
+        correctCount: { type: integer, minimum: 0 }
+        score: { type: integer, minimum: 0, maximum: 100, description: Percentage score }
+    Stats:
+      type: object
+      required: [totalUsers, totalSessions, averageScore, hardestScenarios]
+      properties:
+        totalUsers: { type: integer, minimum: 0 }
+        totalSessions: { type: integer, minimum: 0 }
+        averageScore: { type: number, minimum: 0, maximum: 100 }
+        hardestScenarios:
+          type: array
+          items:
+            type: object
+            required: [scenarioId, subject, correctRate]
+            properties:
+              scenarioId: { type: string, format: uuid }
+              subject: { type: string }
+              correctRate: { type: number, minimum: 0, maximum: 1 }
