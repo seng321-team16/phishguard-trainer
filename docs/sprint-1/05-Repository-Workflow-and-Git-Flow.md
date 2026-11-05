@@ -70,3 +70,9 @@ Applies to **`main`** and **`develop`**:
 5. Create the GitHub Projects board and labels; create issues from `06-Initial-Product-Backlog.md`.
 6. Invite all team members, require two-factor authentication, and add the instructor and teaching assistants as Read collaborators.
 7. Tag the Sprint 1 submission as `v0.1.0`.
+
+## 8. Scrum Ceremonies and Team Coordination
+-The Scrum Master coordinates short stand-up meetings to monitor sprint progress and identify potential blockers. During these meetings, each team member briefly explains what they have completed since the previous update, what they plan to work on next, and whether they are experiencing any difficulties. Stand-ups may also be conducted asynchronously through the team's communication channel. The Scrum Master records important updates and follows up on unresolved issues.
+-At the end of each sprint, the Scrum Master facilitates a retrospective meeting to evaluate the team's performance and working process. Team members discuss what went well, what problems occurred, and what could be improved in the following sprint. The Scrum Master documents the outcomes and ensures that agreed improvement actions are followed up.
+-The Scrum Master is also responsible for monitoring task progress and maintaining the GitHub Projects board according to the workflow defined in Section 5. Reported impediments are tracked and communicated to the relevant team members to prevent unnecessary delays.
+-Pull Request reviews are coordinated in accordance with the repository's review rules. The Scrum Master monitors pending reviews and follows up when review requests exceed the 48-hour response target defined in Section 3.
