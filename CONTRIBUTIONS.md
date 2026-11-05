@@ -26,12 +26,12 @@ Each member maintains their own section through a pull request, so that every en
 | Field | Content |
 |---|---|
 | Student number | 220205005 |
-| GitHub username | _to be added by the member_ |
+| GitHub username | myatagan |
 | Role | Product Owner |
 | Responsibilities | Product vision, backlog ownership and prioritisation, acceptance sign-off, scenario content, administrator statistics |
 
 **Work completed:** _to be added by the member through a pull request, with links_
-
+- Responsibilities of all partipipants were evaluated and necessary corrections made.
 ## Furkan Berkay Öztürk
 
 | Field | Content |
