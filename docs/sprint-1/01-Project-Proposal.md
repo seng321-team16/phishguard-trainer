@@ -82,6 +82,7 @@ The hypothesis can change if the data contradicts it.
 - Gamification beyond a simple score (no leaderboard, badges are a stretch goal).
 - Multi-tenant organisations, SSO, payments, localisation.
 - Field testing with real users (not required by the course spec).
+- Reporting results of field testing to users
 
 ## 6. Assumptions
 
