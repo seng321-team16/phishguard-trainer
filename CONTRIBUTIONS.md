@@ -37,11 +37,20 @@ Each member maintains their own section through a pull request, so that every en
 | Field | Content |
 |---|---|
 | Student number | 210204021 |
-| GitHub username | _to be added by the member_ |
+| GitHub username | [`Areca0`](https://github.com/Areca0) |
 | Role | Scrum Master and Agile Process Coach |
 | Responsibilities | Agile process, stand-ups, retrospectives, impediment tracking, GitHub Projects board, review coordination, administrator scenario-management interface |
 
-**Work completed:** _to be added by the member through a pull request, with links_
+**Work completed (Sprint 1):**
+-Reviewed and verified Document 04 (Team Roles and RACI Matrix), checking role assignments, responsibilities, and consistency across the team. No significant discrepancies were identified.
+-Updated Document 05 (Repository Workflow and Git-Flow Rules) by adding a new section on Scrum ceremonies and team coordination, covering stand-up meetings, sprint retrospectives, impediment tracking, GitHub Projects monitoring, and Pull Request review coordination.
+-Created and configured the GitHub Projects board for PhishGuard Trainer, including the Sprint Board view for task tracking.
+-Reviewed the initial product backlog and GitHub Issues to monitor Sprint 1 progress.
+-Added the completed Sprint 1 Issues #28 and #30 to the Done column of the GitHub Projects board.
+-Contribution evidence:
+-GitHub Projects board: https://github.com/orgs/seng321-team16/projects/1
+-Document 05 update: https://github.com/seng321-team16/phishguard-trainer/pull/33
+-Sprint 1 issue tracking: Issue #28, Issue #30
 
 ## Duhan Kaan Şenol
 
