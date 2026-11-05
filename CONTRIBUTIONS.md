@@ -66,5 +66,5 @@ Each member maintains the section below through their own pull request, so that 
 | Responsibilities | Test plan, unit, integration and end-to-end tests, defect tracking, coverage monitoring, SonarQube report |
 | Work completed | Sprint 1: initial QA test plan, acceptance-criteria testability review and OpenAPI error-response review prepared under [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30) |
 | Issues | [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30), [US-20 #22](https://github.com/seng321-team16/phishguard-trainer/issues/22), [US-23 #25](https://github.com/seng321-team16/phishguard-trainer/issues/25), [US-25 #27](https://github.com/seng321-team16/phishguard-trainer/issues/27) |
-| Pull requests (authored / reviewed) | Authored: QA documentation PR from `feature/30-qa-review`; reviewed: pending an available teammate PR |
+| Pull requests (authored / reviewed) | Authored: [PR #31](https://github.com/seng321-team16/phishguard-trainer/pull/31); reviewed: pending an available teammate PR |
 | Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz) |
