@@ -18,8 +18,8 @@ Each member maintains their own section through a pull request, so that every en
 - Configured the branch ruleset for `main` and `develop` (pull request required, one approval, stale-approval dismissal, conversation resolution, no force pushes, no deletions) and enabled Dependabot, secret scanning and private vulnerability reporting.
 - Authored the system vision and boundary specification, the OpenAPI contract and the repository workflow and Git-Flow rules (`docs/sprint-1/02`, `api/openapi.yaml`, `docs/sprint-1/05`).
 - Drafted the base structure of the project proposal, the team roles and RACI matrix and the initial product backlog (`docs/sprint-1/01`, `04`, `06`) so that the document owners could review and extend them.
-- Pull requests: _add links to authored and reviewed pull requests_
-- Issues: _add links_
+- Pull requests: authored [#1](https://github.com/seng321-team16/phishguard-trainer/pull/1), [#2](https://github.com/seng321-team16/phishguard-trainer/pull/2); reviewed [#31](https://github.com/seng321-team16/phishguard-trainer/pull/31)
+- Issues: [stories assigned to me](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+assignee%3Adalikaan)
 
 ## Murat Yatağan
 
@@ -32,6 +32,7 @@ Each member maintains their own section through a pull request, so that every en
 
 **Work completed:** _to be added by the member through a pull request, with links_
 - Responsibilities of all partipipants were evaluated and necessary corrections made.
+
 ## Furkan Berkay Öztürk
 
 | Field | Content |
