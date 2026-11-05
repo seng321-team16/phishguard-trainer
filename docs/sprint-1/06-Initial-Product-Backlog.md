@@ -52,102 +52,125 @@ As a user I want to log in so that I can access my sessions.
 - Protected endpoints return 401 without a valid token.
 
 **US-03 Role-based access control** · M · 3 pts · Ali Kaan Demiralp · deps: US-02
-As the system I must restrict admin features to admins.
+As a system owner I want admin features restricted to admins so that learners cannot change content or see other users' data.
 - A learner calling any `/admin/**` endpoint gets 403.
 - A learner cannot read another user's results (tested for IDOR).
 
 **US-04 Rate limiting on auth endpoints** · M · 2 pts · Ali Kaan Demiralp · deps: US-02
+As a system owner I want repeated failed logins to be rate-limited so that password guessing is slowed down.
 - More than 5 failed logins per minute per IP/account returns 429 with `Retry-After`.
 - Limit is configurable by environment variable and covered by a test.
 
-**US-05 Request validation and safe errors** · M · 3 pts · Ali Kaan Demiralp · deps: OpenAPI
+**US-05 Request validation and safe errors** · M · 3 pts · Ali Kaan Demiralp · deps: OpenAPI draft (`api/openapi.yaml`)
+As a user I want invalid requests rejected with safe, clear errors so that the system never leaks internal details or runs injected scripts.
 - Requests violating the OpenAPI schema (wrong type, extra fields, over-length) return 400.
 - No stack traces or SQL errors reach clients; errors use problem+json.
 - Scenario text is rendered escaped in the UI (XSS test: `<script>` shows as text).
 
 ### E2 Scenario library
-**US-06 Seed scenario library** · M · 5 pts · Murat Yatağan · deps: US-14 data model
-As a trainer I need at least 30 ready scenarios so the demo is credible.
+**US-06 Seed scenario library** · M · 5 pts · Murat Yatağan · deps: US-14
+As a trainer I want at least 30 ready-made scenarios so that the demo and the first training sessions are credible.
 - 30 scenarios: about 60 % phishing and 40 % legitimate, mix of easy/medium/hard.
 - Each has sender, subject, body, indicators, explanation. Only fictional brands and reserved domains (`.test`, `example.com`).
 - Loadable by a seed script run by docker-compose.
 
 **US-07 Indicator vocabulary** · S · 2 pts · Murat Yatağan · deps: none
+As a learner I want red flags to be named consistently with a plain description so that the feedback is easy to understand.
 - A fixed list of red-flag codes with a human-readable description each, used by both UI and API.
 
 ### E3 Training session
 **US-08 Start a session** · M · 5 pts · Ali Kaan Demiralp · deps: US-02, US-06
-As a learner I want to start a session of N scenarios.
+As a learner I want to start a session of N scenarios so that I can practise in short rounds.
 - Start returns 10 random scenarios by default (1 to 20 allowed).
 - Scenarios in the response contain **no** answer key or explanation.
 - If fewer scenarios exist than requested, return 422.
 
 **US-09 View a scenario in the UI** · M · 5 pts · Duhan Kaan Şenol · deps: US-08
+As a learner I want each scenario to look like a real inbox message so that I practise in realistic conditions.
 - The email is shown like an inbox message (sender name, address, subject, body, link labels with the real target shown as text).
 - Links are never clickable.
 - Works at laptop and phone widths.
 
 **US-10 Submit a verdict and get feedback** · M · 5 pts · Ali Kaan Demiralp · deps: US-08
+As a learner I want to submit my verdict and get instant feedback so that I learn which red flags I missed.
 - Learner chooses *Phishing* or *Legitimate*, optionally ticks suspicious indicators.
 - Response says correct or incorrect, shows the correct verdict, missed indicators and the explanation.
 - The same scenario cannot be answered twice in a session (409).
 - A learner cannot answer in someone else's session (403).
 
 **US-11 Scoring and session result** · M · 3 pts · Ali Kaan Demiralp · deps: US-10
+As a learner I want my session to be scored and saved so that I know how well I did.
 - Score = correct verdicts / total × 100, rounded; completing the session returns the result and stores it.
 - Completing an already-completed session returns 409.
 
 **US-12 Session summary screen** · M · 3 pts · Duhan Kaan Şenol · deps: US-11
+As a learner I want a summary at the end of a session so that I can review what I missed.
 - After the last scenario, the learner sees score, number correct and which scenarios were missed.
 
 ### E4 Progress
 **US-13 Score history** · M · 3 pts · Duhan Kaan Şenol · deps: US-11
+As a learner I want to see my past scores and a trend so that I can track my progress.
 - Learner sees a list (newest first) of own completed sessions with date and score.
 - A simple trend indicator (improving / flat / declining vs. previous) is shown. A chart is a Could.
 
 ### E5 Admin dashboard
-**US-14 Scenario data model and CRUD API** · M · 5 pts · Ali Kaan Demiralp · deps: OpenAPI
+**US-14 Scenario data model and CRUD API** · M · 5 pts · Ali Kaan Demiralp · deps: OpenAPI draft (`api/openapi.yaml`), US-03
+As an admin I want a scenario API so that content can be managed without code changes.
 - Admin can create, read, update, delete scenarios via the API; validation as per the OpenAPI contract.
 - Admin changes record who changed what and when (audit fields).
 
-**US-15 Admin scenario management UI** · M · 8 pts · Furkan Berkay Öztürk · deps: US-14
+**US-15 Admin scenario management UI** · M · 8 pts · Furkan Berkay Öztürk · deps: US-14, US-03
+As an admin I want a scenario management screen so that I can add, edit and delete scenarios without touching code.
 - Admin sees a table of scenarios, can add/edit/delete via forms with validation messages.
 - Deleting asks for confirmation.
 - A learner never sees this page.
 
-**US-16 Admin statistics** · S · 5 pts · Murat Yatağan · deps: US-11
+**US-16 Admin statistics** · S · 5 pts · Murat Yatağan · deps: US-11, US-03
+As an admin I want aggregate statistics so that I can see how learners perform and which scenarios are hardest.
 - Admin sees total users, total sessions, average score, and the 5 hardest scenarios (lowest correct rate).
 - No personal answer data per user is shown.
 
 **US-17 Bootstrap first admin** · M · 2 pts · Ali Kaan Demiralp · deps: US-01
+As an operator I want the first admin to be created from environment variables so that no default password ships in the code.
 - The first admin is created from environment variables at startup (no default password in code).
 - Documented in README.
 
 ### E6 Platform and quality
-**US-18 One-command Docker deployment** · M · 5 pts · Ali Kaan Demiralp · deps: skeleton
+**US-18 One-command Docker deployment** · M · 5 pts · Ali Kaan Demiralp · deps: none (sets up the `api/`, `web/` and `deploy/` skeleton)
+As a grader or developer I want one command to start the whole system so that it runs the same way on any machine.
 - `docker compose up` starts web, api and db and seeds data; the app works at `http://localhost:8080` from a clean checkout.
 - Secrets come from `.env`, not the repository.
 
 **US-19 CI pipeline** · M · 5 pts · Ali Kaan Demiralp · deps: US-18
+As a team member I want CI checks on every pull request so that broken or untested code cannot be merged.
 - GitHub Actions runs lint, unit tests and build on every PR; required by branch protection.
 - Coverage reported; pipeline fails below 50 %.
 
-**US-20 Test suite and test plan** · M · 5 pts · Erol Yağız Gemalmaz · deps: ongoing
+**US-20 Test suite and test plan** · M · 5 pts · Erol Yağız Gemalmaz · deps: US-19; tests are added as US-01 to US-04, US-08, US-10 and US-11 are delivered
+As the QA engineer I want a test plan and automated tests so that core flows and security rules are verified.
 - Test plan document, unit tests for scoring and validation, integration tests for auth and session flow, at least 50 % coverage.
 - Includes security tests: wrong role → 403, rate limit → 429, answer key not leaked in session start.
 
-**US-21 OpenAPI mock and contract check** · S · 3 pts · Ali Kaan Demiralp · deps: OpenAPI
+**US-21 OpenAPI mock and contract check** · S · 3 pts · Ali Kaan Demiralp · deps: OpenAPI draft (`api/openapi.yaml`), US-19
+As a frontend developer I want a mock server generated from the OpenAPI contract so that UI work can start before the API is ready.
 - Mock server from `openapi.yaml` lets the UI work before the API is ready; lint runs in CI.
 
 **US-22 Dependency and licence scanning** · S · 3 pts · Ali Kaan Demiralp · deps: US-19
+As the team we want dependency and licence scanning so that vulnerable or incompatible packages are caught early.
 - Dependabot and an audit command run in CI; licence list generated for the NOTICE file.
 
 **US-23 Static analysis (SonarQube) report** · S · 3 pts · Erol Yağız Gemalmaz · deps: US-19
+As the team we want a SonarQube report so that technical debt is measured for the final submission.
 - SonarQube scan produces the technical-debt report for the final submission.
 
 ### Could-have (only after the MVP works)
-**US-24 Forgot-password flow** · C · 5 pts · Murat Yatağan — requires the optional email stub.
-**US-25 Difficulty filter at session start** · C · 3 pts · Erol Yağız Gemalmaz.
+**US-24 Forgot-password flow** · C · 5 pts · Murat Yatağan · deps: US-02, optional email stub
+As a learner I want to reset a forgotten password so that I can regain access to my account.
+- The reset flow works through the optional local email stub; no real email is sent.
+
+**US-25 Difficulty filter at session start** · C · 3 pts · Erol Yağız Gemalmaz · deps: US-08, US-06
+As a learner I want to choose a difficulty level so that sessions match my skill.
+- Session start accepts an optional difficulty filter (easy / medium / hard).
 
 ## Tasks
 

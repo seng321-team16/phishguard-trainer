@@ -48,13 +48,13 @@ Each member maintains the section below through their own pull request, so that 
 | Field | Content |
 |---|---|
 | Student number | 220205054 |
-| GitHub username | _to be added by the member_ |
+| GitHub username | `ThatsKafiBRO` |
 | Role | Requirements and UX Engineer |
 | Responsibilities | Requirements specification, user stories and acceptance criteria, non-functional requirements, Figma prototypes, learner interface |
-| Work completed | _to be listed with links_ |
-| Issues | _links_ |
-| Pull requests (authored / reviewed) | _links_ |
-| Commits | _links_ |
+| Work completed | Sprint 1: System vision and boundary (`02`) and user stories with acceptance criteria (`06`); story statements and concrete dependencies added ([task](https://github.com/seng321-team16/phishguard-trainer/issues/28)); user story issues US-01 to US-25 created |
+| Issues | [Task](https://github.com/seng321-team16/phishguard-trainer/issues/28), [user stories](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+label%3Atype%3Astory) |
+| Pull requests (authored / reviewed) | Authored: [PR](https://github.com/seng321-team16/phishguard-trainer/pull/29); reviewed: [#1](https://github.com/seng321-team16/phishguard-trainer/pull/1) |
+| Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ThatsKafiBRO) |
 
 ## Erol Yağız Gemalmaz
 
