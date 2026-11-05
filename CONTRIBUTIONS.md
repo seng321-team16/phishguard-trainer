@@ -48,19 +48,23 @@ Each member maintains their own section through a pull request, so that every en
 | Field | Content |
 |---|---|
 | Student number | 220205054 |
-| GitHub username | _to be added by the member_ |
+| GitHub username | `ThatsKafiBRO` |
 | Role | Requirements and UX Engineer |
 | Responsibilities | Requirements specification, user stories and acceptance criteria, non-functional requirements, Figma prototypes, learner interface |
-
-**Work completed:** _to be added by the member through a pull request, with links_
+| Work completed | Sprint 1: System vision and boundary (`02`) and user stories with acceptance criteria (`06`); story statements and concrete dependencies added ([task](https://github.com/seng321-team16/phishguard-trainer/issues/28)); user story issues US-01 to US-25 created |
+| Issues | [Task](https://github.com/seng321-team16/phishguard-trainer/issues/28), [user stories](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+label%3Atype%3Astory) |
+| Pull requests (authored / reviewed) | Authored: [PR](https://github.com/seng321-team16/phishguard-trainer/pull/29); reviewed: [#1](https://github.com/seng321-team16/phishguard-trainer/pull/1) |
+| Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ThatsKafiBRO) |
 
 ## Erol Yağız Gemalmaz
 
 | Field | Content |
 |---|---|
 | Student number | 220204057 |
-| GitHub username | _to be added by the member_ |
+| GitHub username | `ygzgemalmaz` |
 | Role | Quality Assurance and Test Automation Engineer |
 | Responsibilities | Test plan, unit, integration and end-to-end tests, defect tracking, coverage monitoring, SonarQube report |
-
-**Work completed:** _to be added by the member through a pull request, with links_
+| Work completed | Sprint 1: initial QA test plan, acceptance-criteria testability review and OpenAPI error-response review prepared under [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30) |
+| Issues | [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30), [US-20 #22](https://github.com/seng321-team16/phishguard-trainer/issues/22), [US-23 #25](https://github.com/seng321-team16/phishguard-trainer/issues/25), [US-25 #27](https://github.com/seng321-team16/phishguard-trainer/issues/27) |
+| Pull requests (authored / reviewed) | Authored: [PR #31](https://github.com/seng321-team16/phishguard-trainer/pull/31); reviewed: pending an available teammate PR |
+| Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz) |

@@ -64,7 +64,7 @@ Relationship notes (information, direction, purpose, trust):
 
 ## Constraints
 - Course: runs from one Docker / docker-compose command; ≥ 50 % unit-test coverage in CI; OpenAPI-first; open-source licence.
-- Team: 5 members (Takım 16), 10 weeks.
+- Team: 5 members (Team 16), 10 weeks.
 - Ethics: simulator only, no real phishing infrastructure, no real brand impersonation.
 
 ## Security design basics (architecture drivers)
