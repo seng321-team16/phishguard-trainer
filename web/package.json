@@ -1,0 +1,36 @@
+{
+  "name": "@phishguard/web",
+  "version": "0.2.0",
+  "private": true,
+  "description": "PhishGuard Trainer web client (React 18 + Vite)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@phishguard/contract": "^0.2.0",
+    "@tanstack/react-query": "^5.107.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "jsdom": "^31.0.1",
+    "vite": "^7.3.8",
+    "vitest": "^4.1.12"
+  }
+}
