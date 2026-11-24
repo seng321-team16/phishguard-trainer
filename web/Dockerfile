@@ -23,7 +23,7 @@ RUN npm run build --workspace @phishguard/web
 FROM nginx:1.30-alpine AS runtime
 
 # Our configuration replaces the stock one (which expects to run as root on port 80).
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/conf.d/default.conf /usr/share/nginx/html/50x.html
 COPY deploy/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/web/dist /usr/share/nginx/html
 
