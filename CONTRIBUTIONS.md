@@ -29,10 +29,17 @@ Each member maintains their own section through a pull request, so that every en
 | GitHub username | myatagan |
 | Role | Product Owner |
 | Responsibilities | Product vision, backlog ownership and prioritisation, acceptance sign-off, scenario content, administrator statistics |
+**Work completed (Sprint 1)**
+Evaluated the responsibilities and RACI assignments of all team members (`docs/sprint-1/04`) and applied necessary corrections.
+- Reviewed and prioritized the initial product backlog (`docs/sprint-1/06`) across Must/Should/Could categories (`US-01` to `US-25`) to define the Sprint 3 MVP scope[cite: 1, 2, 3].
+- Defined product vision, scope boundaries, and domain constraints (simulator-only architecture, fictional brands/reserved domains, and seed scenario distribution)[cite: 2, 6, 9].
 
-**Work completed:** _to be added by the member through a pull request, with links_
-- Responsibilities of all partipipants were evaluated and necessary corrections made.
-
+**Work completed (Sprint 2)**
+- Reviewed the Software Requirements Specification (`01-Software-Requirements-Specification.pdf`) against product vision and acceptance criteria[cite: 2].
+- Resolved open Product Owner specification decisions (`OI-01`, `OI-02`, `OI-04`, `OI-05`, `OI-07`, `OI-08`, `OI-10`, `OI-12`, `OI-18`, `OI-19`) in the Decision Log (`docs/process/decision-log.md`, task `T-57`) covering seed scenario ratios, indicator vocabulary, scoring/trend rules, and admin statistics[cite: 21, 22].
+- Prepared and validated the seed scenario library content (30+ phishing and legitimate scenarios with indicators and explanations)[cite: 9, 10].
+- Pull requests: authored [#<PR_NO>](https://github.com/seng321-team16/phishguard-trainer/pull/<PR_NO>); reviewed [#<PR_NO>](https://github.com/seng321-team16/phishguard-trainer/pull/<PR_NO>)
+- Issues & Commits: [Assigned issues](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+assignee%3Amyatagan) · [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=myatagan)
 ## Furkan Berkay Öztürk
 
 | Field | Content |
