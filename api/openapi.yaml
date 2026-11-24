@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: PhishGuard Trainer API
-  version: 0.1.0
+  version: 0.2.0
   summary: REST contract for a phishing-awareness simulator (no real email is ever sent).
   description: |
     Learners practise judging fake emails and receive feedback. Admins manage scenarios.
@@ -19,9 +19,23 @@ tags:
   - name: Training
   - name: Results
   - name: Admin
+  - name: System
 security:
   - bearerAuth: []
 paths:
+  /health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: Liveness probe (no authentication)
+      security: []
+      responses:
+        '200':
+          description: The API process is up
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Health' }
+              example: { status: ok }
   /auth/register:
     post:
       tags: [Auth]
@@ -335,6 +349,12 @@ components:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
   schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
     Problem:
       type: object
       required: [title, status]

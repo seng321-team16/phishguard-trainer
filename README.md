@@ -20,6 +20,7 @@ A web-based phishing-awareness **simulator**. Learners judge fictional emails, r
 |---|---|
 | `api/` | Backend service and the OpenAPI contract (`api/openapi.yaml`) |
 | `web/` | Web client |
+| `packages/contract/` | TypeScript types generated from the OpenAPI contract |
 | `deploy/` | Docker and docker-compose configuration |
 | `docs/` | Project documentation (Sprint 1 deliverables in `docs/sprint-1/`) |
 | `.github/` | Issue and pull request templates, CODEOWNERS, automation |
@@ -32,6 +33,20 @@ A web-based phishing-awareness **simulator**. Learners judge fictional emails, r
 - [Team roles and RACI](docs/sprint-1/04-Team-Roles-and-RACI.md)
 - [Repository workflow and Git-Flow](docs/sprint-1/05-Repository-Workflow-and-Git-Flow.md)
 - [Initial product backlog](docs/sprint-1/06-Initial-Product-Backlog.md)
+
+## Development
+
+The repository is an npm workspaces monorepo: `api` (Express), `web` (React + Vite) and `packages/contract` (TypeScript types generated from `api/openapi.yaml`). Node.js 20 LTS is required (see `.nvmrc`).
+
+| Step | Command | What it does |
+|---|---|---|
+| Install | `npm ci` | Installs the dependencies of every workspace from `package-lock.json` |
+| Run | `npm run dev` | Starts the API on `http://localhost:3000` and the web client on `http://localhost:5173` (Vite proxies `/api` to the API) |
+| Test | `npm test` | Runs the unit tests of every workspace (`npm run test:coverage` also writes `coverage/`) |
+| Check | `npm run lint`, `npm run typecheck`, `npm run build` | ESLint, TypeScript and production builds |
+| Contract types | `npm run gen:contract` | Regenerates `packages/contract/src/schema.d.ts` after a change to `api/openapi.yaml` |
+
+Configuration comes from environment variables; copy `.env.example` to `.env` when a value must differ from the defaults. Health check: `GET http://localhost:3000/api/v1/health` returns `{ "status": "ok" }`.
 
 ## Running the project
 
