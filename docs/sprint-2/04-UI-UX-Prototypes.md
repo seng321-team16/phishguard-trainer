@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Project | PhishGuard Trainer – a phishing-awareness simulator |
-| Version | 1.0 |
-| Date | 2026-11-15 |
+| Version | 1.1 |
+| Date | 2026-11-18 (version 1.0: 2026-11-15) |
 | Owner | Duhan Kaan Şenol (`ThatsKafiBRO`) – Requirements & UX Engineer |
 | Team | SENG 321 – Team 16 |
 | Related tasks | T-54 (this document and the prototypes), T-59 (user flows), T-56 (non-functional requirements), T-18 (indicator vocabulary), T-69 (web app shell, uses the tokens), T-23, T-25, T-36 (screens built from this specification), T-47 (accessibility scan), T-80 (usability evaluation) |
@@ -210,6 +210,8 @@ Every screen is built from the components below. The class names are those of th
 Each section gives the purpose, the two exports, the elements, the states, the API operation and the accessibility notes of one screen, and links it to its flows. Screen IDs, routes and flows are those of [`05-User-Flows.md`](05-User-Flows.md).
 
 In every section the **left image is the desktop export (1366 px wide)** and the **right image is the mobile export (390 px wide)**. The files are in `design/exports/` at full size.
+
+Section 5 is the specification of Sprint 2. The built product differs from it in four points on SCR-01, SCR-03, SCR-04 and SCR-08; they are listed in [section 9](#9-differences-in-the-built-screens-final).
 
 States that apply to **every** screen from SCR-03 to SCR-10 are described once here and not repeated:
 
@@ -437,12 +439,12 @@ The export shows the five states below each other. The dashed captions are notes
 |---|---|---|---|---|
 | SCR-01 | `SCR-01-login.html` | 5, SCR-01 | FLOW-01, 02, 07 | `login`, `getCurrentUser` |
 | SCR-02 | `SCR-02-register.html` | 5, SCR-02 | FLOW-01 | `registerUser` |
-| SCR-03 | `SCR-03-home.html` | 5, SCR-03 | FLOW-01 … 07 | `startSession`, `listMyResults`, `getCurrentUser` |
+| SCR-03 | `SCR-03-home.html` | 5, SCR-03 | FLOW-01 … 07 | `startSession`, `getCurrentUser` (as built, UI-DIFF-01) |
 | SCR-04 | `SCR-04-inbox-scenario-view.html` | 5, SCR-04 | FLOW-03 | `submitAnswer` |
 | SCR-05 | `SCR-05-feedback-panel.html` | 5, SCR-05 | FLOW-03 | `submitAnswer` (answer), `completeSession` |
 | SCR-06 | `SCR-06-session-summary.html` | 5, SCR-06 | FLOW-03, 04 | `completeSession` (answer) |
 | SCR-07 | `SCR-07-score-history.html` | 5, SCR-07 | FLOW-03, 04 | `listMyResults` |
-| SCR-08 | `SCR-08-admin-scenario-list.html` | 5, SCR-08 | FLOW-05, 06, 07 | `adminListScenarios`, `adminDeleteScenario` |
+| SCR-08 | `SCR-08-admin-scenario-list.html` | 5, SCR-08 | FLOW-05, 06, 07 | `adminListScenarios` (one read of the whole library; search and paging in the browser, UI-DIFF-03), `adminDeleteScenario` |
 | SCR-09 | `SCR-09-admin-scenario-form.html` | 5, SCR-09 | FLOW-05, 07 | `adminGetScenario`, `adminCreateScenario`, `adminUpdateScenario` |
 | SCR-10 | `SCR-10-admin-statistics.html` | 5, SCR-10 | FLOW-06, 07 | `adminGetStats` |
 | SCR-11 | `SCR-11-error-and-empty-states.html` | 5, SCR-11 | FLOW-03 … 07 | – |
@@ -482,8 +484,24 @@ The Figma file is rebuilt by hand from this prototype: the tokens become Figma v
 
 ---
 
+## 9 Differences in the built screens (Final)
+
+Sections 4 and 5 describe the screens as they were designed in Sprint 2 and are kept as they were. This section, added for the Final delivery, lists the four points in which the built web application (`web/src`, checked on 2026-11-18) differs from them. The prototype files and the PNG exports still show the Sprint 2 design. Where this section and section 5 disagree, this section describes the product.
+
+| ID | Screen | Specified (sections 4 and 5) | Built | Where in the code |
+|---|---|---|---|---|
+| UI-DIFF-01 | SCR-03 Home | Card *Your last session* with score, "*x* of *N* correct", date and the link *View score history*; state *No session yet*; operation `listMyResults` with `limit=1`. | **Not built.** The home screen shows the card *Start a training session* and, for an admin, the card *Administration*. It calls `startSession` only (and `getCurrentUser` for the role); `listMyResults` is called on SCR-07 only. The last result is reached through *History* in the page header. | `web/src/features/training/HomePage.tsx`; `web/src/features/history/HistoryPage.tsx` |
+| UI-DIFF-02 | SCR-04 Inbox scenario view | Leaving an unfinished session opens the confirmation dialog "Leave this session? …" (states of SCR-04; component *Modal dialog*, used on "SCR-04 (leave session)"). | **Not built.** The learner can leave SCR-04 at any time through the page header and is not asked. The session is not completed on the server. The browser keeps it in memory only, so reloading the page or logging out ends it. The modal dialog is used on SCR-08 only. | `web/src/features/training/TrainingPage.tsx`; `web/src/features/training/trainingSession.ts` |
+| UI-DIFF-03 | SCR-08 Admin scenario list | Table column *Created*; `adminListScenarios` is called for each page of the table (server-side paging); no search. | **Different.** The column is *Updated*: date of the last change and who made it ("by you" or "by admin" with the start of the ID). The screen has a field *Search scenarios* over subject, sender name and sender address, with the state "No scenario matches your search" and *Clear search*. The whole library is read once with `adminListScenarios` (`limit` 100 per request); search and paging (20 rows per page) happen in the browser, because the contract has no search parameter. | `web/src/features/admin/ScenarioListPage.tsx`; `web/src/features/admin/scenarioList.ts` |
+| UI-DIFF-04 | SCR-01 Login, SCR-02 Register | After a successful registration (201) SCR-01 shows a green **notice** "Account created. Log in to start."; the toast is used on SCR-08 only (component *Toast*). | **Different.** SCR-01 opens with the username pre-filled and the same text as a **toast**, which disappears after 5 seconds. There is no notice for it in the form. The toast is therefore used on SCR-01 and SCR-08. | `web/src/features/auth/RegisterPage.tsx`; `web/src/components/Toast.tsx` |
+
+Whether the card *Your last session* and the leave confirmation are built later is a product decision of the Product Owner; this document only records the state of the product.
+
+---
+
 ## Revision history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-15 | Duhan Kaan Şenol | First version for Sprint 2 (task T-54): tokens, 11 screen prototypes, 22 exports, UI specification. |
+| 1.1 | 2026-11-18 | Duhan Kaan Şenol | Section 9 added: four differences between this specification and the built screens (UI-DIFF-01 … UI-DIFF-04). Table of section 7.1 corrected for SCR-03 and SCR-08; note at the start of section 5. Sections 4 and 5 are otherwise unchanged. |
