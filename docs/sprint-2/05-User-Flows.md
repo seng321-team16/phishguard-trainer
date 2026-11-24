@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Project | PhishGuard Trainer – a phishing-awareness simulator |
-| Version | 1.0 |
-| Date | 2026-11-15 |
+| Version | 1.1 |
+| Date | 2026-11-18 |
 | Owner | Duhan Kaan Şenol (`ThatsKafiBRO`) – Requirements & UX Engineer |
 | Team | SENG 321 – Team 16 |
 | Related tasks | T-59 (this document), T-53 (SRS, use cases), T-57 (decision log), T-54 (UI/UX prototypes and UI specification), T-69 (web app shell) |
@@ -55,7 +55,7 @@ The screen identifiers are fixed here and are used unchanged by the UI/UX protot
 | SCR-02 | Register | Create a learner account | Visitor | `/register` | FR-01 … FR-04, FR-16 |
 | SCR-03 | Home / Dashboard | Start screen after login: start a session, go to the history; admins also see the administration entries | Learner, Admin | `/` | FR-09, FR-28, FR-29, FR-61 |
 | SCR-04 | Inbox scenario view | One scenario shown like an inbox message, with the verdict controls and the indicator checklist | Learner, Admin | `/training` | FR-20, FR-43 … FR-46 |
-| SCR-05 | Feedback panel | Feedback for the submitted verdict; opens inside SCR-04 below the message | Learner, Admin | (panel of SCR-04) | FR-26, FR-34, FR-43 |
+| SCR-05 | Feedback panel | Feedback for the submitted verdict; opens inside SCR-04, beside the message on a laptop and below it on a phone | Learner, Admin | (panel of SCR-04) | FR-26, FR-34, FR-43 |
 | SCR-06 | Session summary | Score, correct answers out of total, wrongly answered scenarios | Learner, Admin | `/training/summary` | FR-47 |
 | SCR-07 | Score history | Completed sessions, newest first, with trend | Learner, Admin | `/history` | FR-48 … FR-51 |
 | SCR-08 | Admin scenario list | Table of all scenarios; entry to create, edit and delete (delete confirmation dialog) | Admin | `/admin/scenarios` | FR-53, FR-58, FR-60 |
@@ -165,7 +165,7 @@ flowchart TD
 | 1 | SCR-01 | Chooses *Create account*. | The registration form opens. | – | – |
 | 2 | SCR-02 | Enters username, email address and password and submits. | The user interface checks the format first (step 3). | – | – |
 | 3 | SCR-02 | – | Format check in the browser: username 3–32 allowed characters, valid email, password 12–128 characters. If valid, the registration is sent. | `registerUser` | Invalid in the browser: a message next to each invalid field; nothing is sent. **400**: the message of each entry of `errors[]` is shown next to its field (UC-01 4a, D-12). **409**: "username or email is already in use"; the form stays filled, except the password (UC-01 4b). **429**: "too many attempts, try again in *n* seconds" from `Retry-After`; the submit button is disabled until then (UC-01 4c). |
-| 4 | SCR-01 | – | 201: the login screen is shown with the notice "Account created. Log in to start." The username is pre-filled; the password is not. | – | – |
+| 4 | SCR-01 | – | 201: the login screen is shown and a toast says "Account created. Log in to start." The username is pre-filled; the password is not. | – | – |
 | 5 | SCR-01 | Enters username and password and submits. | 200: the user interface keeps the access token and asks for the profile. | `login`, then `getCurrentUser` | Wrong password or too many attempts: see FLOW-02 steps 2 and 3. |
 | 6 | SCR-03 | – | The home screen for the role `learner` is shown with a *Start session* control. | – | `getCurrentUser` answers 401: FLOW-07. |
 
@@ -242,7 +242,7 @@ The loop of steps 2 to 5 runs once per scenario: **10 times** in the default ses
 | 6 | SCR-06 | – | The summary shows the score (0–100), "*x* of *N* correct" and the list of wrongly answered scenarios with their subjects (FR-47). The list is built from the feedback received in step 4. | – | – |
 | 7 | SCR-06 | Chooses *Start another session* or *View history*. | SCR-03 or SCR-07 is shown. | – (*View history* continues in FLOW-04) | – |
 
-Leaving early: if the learner leaves SCR-04 before the last scenario (navigation, closing the browser, token expiry), the answers given so far stay stored and the session stays open (UC-03 postconditions). API contract 0.2.0 has no operation to read an open session again, so the user interface offers no "resume"; the learner starts a new session. SCR-04 asks for confirmation before the learner navigates away from an unfinished session.
+Leaving early: if the learner leaves SCR-04 before the last scenario (navigation, closing the browser, token expiry), the answers given so far stay stored and the session stays open (UC-03 postconditions). API contract 0.2.0 has no operation to read an open session again, so the user interface offers no "resume"; the learner starts a new session. SCR-04 does not ask for confirmation: the learner can leave at any time; the session stays open.
 
 ### FLOW-04 Score history
 
@@ -304,8 +304,8 @@ flowchart TD
 
 | Step | Screen | User action | System response | API operationId | Error branch |
 |---|---|---|---|---|---|
-| 1 | SCR-03 | Chooses *Scenarios* in the navigation (shown to admins only). | The first page of the library is requested. | `adminListScenarios` | **403** (UC-05 1a): the caller is not an admin; SCR-11 *forbidden* (FLOW-07). |
-| 2 | SCR-08 | Reads the table; may change the page. | The table shows subject, sender, verdict (phishing or legitimate), difficulty and creation date for each scenario, with *Edit* and *Delete* on each row and *New scenario* above the table. | `adminListScenarios` (again for each page) | Empty library: SCR-11 empty state "no scenarios yet" with the *New scenario* button. |
+| 1 | SCR-03 | Chooses *Scenarios* in the navigation (shown to admins only). | The library is requested; it is read once, with at most 100 scenarios per request. | `adminListScenarios` | **403** (UC-05 1a): the caller is not an admin; SCR-11 *forbidden* (FLOW-07). |
+| 2 | SCR-08 | Reads the table; may change the page. | The table shows subject, sender, verdict (phishing or legitimate), difficulty and the date of the last update (column *Updated*) for each scenario, with *Edit* and *Delete* on each row and *New scenario* above the table. Changing the page sends no request: the library read in step 1 is paged in the browser. | – | Empty library: SCR-11 empty state "no scenarios yet" with the *New scenario* button. |
 | 3 | SCR-08 | Chooses *New scenario*. | The empty form opens. | – | – |
 | 4 | SCR-09 | Fills in subject, sender name, sender address, reply-to (optional), body, up to five links, verdict, indicators, difficulty and explanation; chooses *Save*. | Required fields and lengths are checked in the browser. 201: back to SCR-08 with the notice "scenario saved"; the table is reloaded. | `adminCreateScenario` | Invalid in the browser, or **400** (UC-05 3a: missing field, text too long, unknown indicator, more than five links): a message next to each invalid field; the entered values stay; nothing is stored. |
 | 5 | SCR-08 | Chooses *Edit* on a row. | The scenario is read with its answer key and the form opens filled in. | `adminGetScenario` | **404** (UC-05 4b): notice "this scenario no longer exists"; the table is reloaded. |
@@ -460,3 +460,4 @@ Result: every screen appears in at least one flow, and every flow uses only scre
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-15 | Duhan Kaan Şenol | First version for Sprint 2 (task T-59). |
+| 1.1 | 2026-11-18 | Duhan Kaan Şenol | Four steps corrected to the built system (audit finding P7-07): SCR-05 opens beside the message on a laptop and below it on a phone; FLOW-01 step 4 shows a toast; FLOW-03 has no confirmation on leaving a session; FLOW-05 steps 1 and 2 read the library once and show the column *Updated*. |
