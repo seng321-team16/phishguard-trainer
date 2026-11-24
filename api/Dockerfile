@@ -42,6 +42,8 @@ COPY --from=build --chown=node:node /app/packages/contract packages/contract
 COPY --from=build --chown=node:node /app/api/package.json api/
 COPY --from=build --chown=node:node /app/api/node_modules api/node_modules
 COPY --from=build --chown=node:node /app/api/dist api/dist
+# Schema, migrations and seed: `prisma migrate deploy` and `prisma db seed` run at start-up.
+COPY --from=build --chown=node:node /app/api/prisma api/prisma
 
 # Non-root: the official image ships an unprivileged "node" user (uid 1000).
 USER node
