@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | Project | PhishGuard Trainer – a phishing-awareness simulator |
-| Version | 1.1 |
-| Date | 2026-11-18 (version 1.0: 2026-11-15) |
+| Version | 1.2 |
+| Date | 2026-11-24 (version 1.0: 2026-11-15) |
 | Owner | Duhan Kaan Şenol (`ThatsKafiBRO`) – Requirements & UX Engineer |
 | Team | SENG 321 – Team 16 |
 | Related tasks | T-54 (this document and the prototypes), T-59 (user flows), T-56 (non-functional requirements), T-18 (indicator vocabulary), T-69 (web app shell, uses the tokens), T-23, T-25, T-36 (screens built from this specification), T-47 (accessibility scan), T-80 (usability evaluation) |
@@ -475,12 +475,13 @@ The export shows the five states below each other. The dashed captions are notes
 
 | Item | Value |
 |---|---|
-| Figma file | *PhishGuard Trainer – UI* |
-| Link (anyone with the link can view) | FIGMA_LINK_TBD |
+| Figma file | *PhishGuard Trainer – UI Desktop* |
+| Design file (anyone with the link can view) | <https://www.figma.com/design/hWaCcAVMEG5T2rlIgRFZST/PhishGuard-Trainer-%E2%80%93-UI-Desktop?node-id=0-1> |
+| Clickable prototype | <https://www.figma.com/proto/hWaCcAVMEG5T2rlIgRFZST/PhishGuard-Trainer-%E2%80%93-UI-Desktop?node-id=0-1> |
 | Pages | Tokens, Components, Desktop, Mobile, Flows |
 | Source of the frames | The PNG exports in `design/exports/` and the tokens in `design/tokens.css` |
 
-The Figma file is rebuilt by hand from this prototype: the tokens become Figma variables and styles, each screen becomes one frame at 1366×768 and one at 390×844 with auto layout, and the prototype interactions follow FLOW-01 … FLOW-07. The HTML prototype stays the reference; when the two differ, the tokens and this document decide.
+The Figma file was rebuilt by hand from this prototype: the tokens become Figma variables and styles, each screen becomes one frame at 1366×768 and one at 390×844 with auto layout, and the prototype interactions follow FLOW-01 … FLOW-07. The HTML prototype stays the reference; when the two differ, the tokens and this document decide.
 
 ---
 
@@ -505,3 +506,4 @@ Whether the card *Your last session* and the leave confirmation are built later 
 |---|---|---|---|
 | 1.0 | 2026-11-15 | Duhan Kaan Şenol | First version for Sprint 2 (task T-54): tokens, 11 screen prototypes, 22 exports, UI specification. |
 | 1.1 | 2026-11-18 | Duhan Kaan Şenol | Section 9 added: four differences between this specification and the built screens (UI-DIFF-01 … UI-DIFF-04). Table of section 7.1 corrected for SCR-03 and SCR-08; note at the start of section 5. Sections 4 and 5 are otherwise unchanged. |
+| 1.2 | 2026-11-24 | Duhan Kaan Şenol | Section 8: the placeholder `FIGMA_LINK_TBD` replaced by the links to the Figma design file and its clickable prototype. |
