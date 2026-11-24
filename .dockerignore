@@ -1,0 +1,38 @@
+# Keeps the build context small and keeps secrets and local artefacts out of images.
+# Both images are built from the repository root:
+#   docker build -f api/Dockerfile .
+#   docker build -f web/Dockerfile .
+
+# Dependencies and build output (always re-created inside the image)
+node_modules
+**/node_modules
+dist
+**/dist
+build
+**/build
+coverage
+**/coverage
+
+# Secrets and local configuration (configuration is injected at run time)
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+
+# Not needed to build or run the application
+docs
+playbook
+e2e
+design
+.git
+.github
+.claude
+.autopilot
+.vscode
+.idea
+*.log
+*.md
+**/*.test.ts
+**/*.test.tsx
