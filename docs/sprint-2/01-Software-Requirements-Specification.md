@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Project | PhishGuard Trainer – a phishing-awareness simulator |
-| Version | 1.0 |
+| Version | 1.1 |
 | Date | 2026-11-15 |
 | Owner | Duhan Kaan Şenol (`ThatsKafiBRO`) – Requirements & UX Engineer |
 | Team | SENG 321 – Team 16 |
@@ -62,7 +62,8 @@ The product is a **simulator only**. It never sends email and never contacts rea
 | FR / NFR | Functional requirement / non-functional requirement. |
 | UC | Use case. |
 | US | User story from the product backlog. |
-| OI | Open issue (a question that still needs a decision). |
+| OI | Open issue (a question that needed a decision; see the Appendix). |
+| D | Decision of the Product Owner in the decision log. |
 | M / S / C | Priority: Must / Should / Could. |
 
 ### 1.4 References
@@ -79,6 +80,8 @@ The product is a **simulator only**. It never sends email and never contacts rea
 | R-8 | Architecture decision records | `docs/adr/` |
 | R-9 | ISO/IEC/IEEE 29148:2018, Systems and software engineering – Life cycle processes – Requirements engineering | external standard |
 | R-10 | RFC 9457, Problem Details for HTTP APIs | external standard |
+| R-11 | Refined Product Backlog (Sprint 2) | `docs/sprint-2/03-Refined-Product-Backlog.md` |
+| R-12 | Decision Log (decisions D-01 … D-19) | `docs/process/decision-log.md` |
 
 ### 1.5 Document conventions
 
@@ -111,7 +114,7 @@ flowchart LR
     System -.->|optional: password-reset message to a local stub| Mail[Local email stub]
 ```
 
-The only external element is the optional local email stub used by the Could-have password-reset story (US-24). It writes messages to a local log and never delivers email.
+The only external element is the optional local email stub used by the Could-have password-reset story (US-24). It keeps messages in a local mailbox and never delivers email (D-18).
 
 ### 2.2 Product functions (summary)
 
@@ -180,7 +183,7 @@ The assumptions are reused from R-1 §6 and keep their numbers.
 **Dependencies.**
 
 - The API contract (R-4) must exist before the user interface and the API are built. It exists in version 0.2.0.
-- The open questions in the Appendix must be decided by the Product Owner (task T-57) before the affected tests are written.
+- The open questions in the Appendix had to be decided by the Product Owner before the affected tests are written. They are decided: the decision log (R-12) holds decisions D-01 … D-19, and this document applies them.
 - The optional password-reset story (US-24) depends on the local email stub.
 
 ---
@@ -231,7 +234,7 @@ The user interface talks to the server only through the REST API described by th
 Other software interfaces:
 
 - **Data store.** The API is the only component that reads or writes the data store. The data store is not reachable by users.
-- **Local email stub (optional, US-24).** A stand-in that records the password-reset message locally. No real mail service is contacted (C-06).
+- **Local email stub (optional, US-24).** A stand-in mailbox that keeps the password-reset message locally. No real mail service is contacted (C-06).
 
 ### 3.3 Communication interfaces
 
@@ -249,7 +252,7 @@ Other software interfaces:
 
 ## 4 Functional requirements
 
-One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority (M/S/C), **Source** = user story, **Verif.** = verification method (Test / Inspection / Demonstration). Requirements that touch an open question point to the open issue (`OI-xx`) in the Appendix.
+One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority (M/S/C), **Source** = user story, **Verif.** = verification method (Test / Inspection / Demonstration). Where the Product Owner decided an open question, the requirement states the decided rule and names the decision (`D-xx`) of the decision log (R-12); the exact rules and test examples are given there. The Appendix shows which decision closed which open issue.
 
 ### 4.1 F1.1 Account registration and login
 
@@ -258,13 +261,13 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 | FR-01 | The system shall let a visitor register an account by giving a username (3–32 characters: letters, digits, `_`, `.`, `-`), an email address (valid format, at most 254 characters) and a password (12–128 characters). | M | US-01 | Test |
 | FR-02 | When a registration is valid, the system shall create the account with the role `learner` and answer 201 with the account profile (identifier, username, email, role, creation time). | M | US-01 | Test |
 | FR-03 | The system shall reject a registration whose username or email address is already in use with 409 and shall not create an account. | M | US-01 | Test |
-| FR-04 | The system shall reject a registration with an invalid email address, a password shorter than 12 characters or any other invalid field with 400 and a problem description that states the reason (see OI-01). | M | US-01 | Test |
-| FR-05 | The system shall store a password only as a salted hash produced by a memory-hard password-hashing function and shall never return a password or write it to a log. | M | US-01 | Test |
-| FR-06 | The system shall answer a login with valid credentials with 200 and an access token, its type and its lifetime in seconds (see OI-02). | M | US-02 | Test |
+| FR-04 | The system shall reject a registration with an invalid email address, a password shorter than 12 characters or any other invalid field with 400 and a problem description that states the reason: the problem details carry a list `errors[]` in which every invalid field has one entry with `field` and `message` (D-12). | M | US-01 | Test |
+| FR-05 | The system shall store a password only as a salted hash produced by a memory-hard password-hashing function and shall never return a password or write it to a log; a test searches every response and the captured log for a known test password and finds none (D-12). | M | US-01 | Test |
+| FR-06 | The system shall answer a login with valid credentials with 200 and an access token, its type and its lifetime in seconds; a token shall be valid for 60 minutes, reported as 3600 seconds (D-01). | M | US-02 | Test |
 | FR-07 | The system shall reject a login with wrong credentials with 401 and shall give exactly the same response for an unknown user and for a wrong password. | M | US-02 | Test |
 | FR-08 | The system shall answer 401 to every request for a protected operation that carries no access token or an invalid or expired one. | M | US-02 | Test |
 | FR-09 | The system shall return the profile (identifier, username, email, role, creation time) of the logged-in user on request. | M | US-02 | Test |
-| FR-10 | The system shall let a logged-in user log out; after logout the user interface shall hold no access token and shall show the login screen (see OI-02). | M | US-02 | Demonstration |
+| FR-10 | The system shall let a logged-in user log out; after logout the user interface shall hold no access token and shall show the login screen. Logout is an action of the user interface, which discards the token; the API has no logout operation (D-01). | M | US-02 | Demonstration |
 
 ### 4.2 F1.2 Access control and abuse protection
 
@@ -273,8 +276,8 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 | FR-11 | The system shall allow administration operations (every operation under `/admin`) only for users with the role `admin` and shall answer 403 to a logged-in learner. | M | US-03 | Test |
 | FR-12 | The system shall check the caller's role on the server for every request and shall not trust any role information sent by the client. | M | US-03 | Test |
 | FR-13 | The system shall refuse a user who tries to read, answer or complete a training session or result that belongs to another user. | M | US-03 | Test |
-| FR-14 | The system shall answer 429 with a `Retry-After` header (whole seconds) when more than 5 failed logins are made within one minute for the same client address or account (see OI-03). | M | US-04 | Test |
-| FR-15 | The system shall take the failed-login limit from the deployment configuration, so that it can be changed without changing code. | M | US-04 | Test |
+| FR-14 | The system shall answer 429 with a `Retry-After` header (whole seconds) to the 6th and every further login attempt after 5 failed logins within one fixed 60-second window for the same pair of client address and username; only failed logins shall be counted (D-02). | M | US-04 | Test |
+| FR-15 | The system shall take the failed-login limit (default 5) from the deployment configuration, so that it can be changed without changing code. | M | US-04 | Test |
 | FR-16 | The system shall also limit the rate of registration requests and answer 429 with `Retry-After` when the limit is exceeded. | S | US-04 | Test |
 | FR-17 | The system shall check every request against the API contract and shall reject a wrong type, an unknown field or an over-length value with 400. | M | US-05 | Test |
 | FR-18 | The system shall return every error as problem details (`application/problem+json`) with at least a title and the status code. | M | US-05 | Test |
@@ -285,12 +288,12 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
-| FR-21 | The system shall be delivered with a seed library of at least 30 scenarios, about 60 % phishing and 40 % legitimate, with easy, medium and hard scenarios (see OI-04). | M | US-06 | Inspection |
+| FR-21 | The system shall be delivered with a seed library of exactly 30 scenarios: 18 phishing and 12 legitimate, with at least 8 easy, 8 medium and 8 hard scenarios (D-09). | M | US-06 | Inspection |
 | FR-22 | Each scenario shall have a sender name, a sender address, a subject, a body, a correct verdict, a difficulty, an explanation and the list of indicators that apply to it. | M | US-06 | Inspection |
 | FR-23 | Scenario content shall use only fictional brands and reserved domains (`example.com`, `example.org`, `.test`) and shall contain no real logo and no working link. | M | US-06 | Inspection |
 | FR-24 | The system shall load the seed library by a seed procedure that runs as part of the one-command start-up, without manual steps. | M | US-06 | Demonstration |
-| FR-25 | The system shall define one fixed list of indicator codes (`sender_domain_mismatch`, `urgent_language`, `suspicious_link`, `credential_request`, `unexpected_attachment`, `generic_greeting`, `spelling_grammar`, `too_good_to_be_true`, `mismatched_reply_to`) that the user interface and the API both use (see OI-05). | S | US-07 | Inspection |
-| FR-26 | The system shall show a plain-language description for every indicator code wherever an indicator is shown to a user. | S | US-07 | Demonstration |
+| FR-25 | The system shall define one fixed list of indicator codes (`sender_domain_mismatch`, `urgent_language`, `suspicious_link`, `credential_request`, `unexpected_attachment`, `generic_greeting`, `spelling_grammar`, `too_good_to_be_true`, `mismatched_reply_to`) that the user interface and the API both use; the list in the API contract is the canonical one (D-13). | S | US-07 | Inspection |
+| FR-26 | The system shall show a name and a plain-language description for every indicator code wherever an indicator is shown to a user; names and descriptions shall be non-empty and unique (D-13). | S | US-07 | Demonstration |
 | FR-27 | The system shall reject any indicator code that is not in the fixed list with 400. | S | US-07 | Test |
 
 ### 4.4 F3.1 Training session lifecycle
@@ -299,17 +302,17 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 |---|---|---|---|---|
 | FR-28 | The system shall let a logged-in user start a training session and shall answer 201 with the session and, by default, 10 scenarios. | M | US-08 | Test |
 | FR-29 | The system shall accept a requested number of scenarios from 1 to 20 and shall reject any other number with 400. | M | US-08 | Test |
-| FR-30 | The system shall choose the scenarios of a session at random from the library, with no scenario appearing twice in the same session (see OI-06). | M | US-08 | Test |
+| FR-30 | The system shall choose the scenarios of a session at random from the library, with no scenario appearing twice in the same session; the selection shall take its random source as an input, so that a test with a seeded source gets a repeatable result (D-14). | M | US-08 | Test |
 | FR-31 | The system shall not reveal the answer key (correct verdict, indicators, explanation) of a scenario to a learner before the learner has submitted a verdict for it. | M | US-08 | Test |
-| FR-32 | The system shall answer 422 and create no session when fewer scenarios are available than requested. | M | US-08 | Test |
+| FR-32 | The system shall answer 422 and create no session when the pool of selectable scenarios (all scenarios that are not deleted) is smaller than the requested number (D-14). | M | US-08 | Test |
 | FR-33 | The system shall let the owner of a session submit one verdict (`phishing` or `legitimate`) for a scenario of that session, optionally with the indicators the learner noticed. | M | US-10 | Test |
 | FR-34 | The system shall answer a submitted verdict with feedback: whether it was correct, the correct verdict, the indicators of the scenario, the indicators the learner missed, the explanation and the points awarded. | M | US-10 | Test |
 | FR-35 | The system shall reject a second verdict for the same scenario in the same session with 409 and shall keep the first verdict. | M | US-10 | Test |
 | FR-36 | The system shall reject a verdict submitted to a session that belongs to another user with 403. | M | US-10 | Test |
 | FR-37 | The system shall answer 404 when a verdict is submitted to a session that does not exist or for a scenario that is not part of the session. | M | US-10 | Test |
 | FR-38 | The system shall reject a verdict submitted to a session that is already completed with 409. | M | US-10 | Test |
-| FR-39 | The system shall calculate the session score as the number of correct verdicts divided by the number of scenarios in the session, times 100, rounded to a whole number from 0 to 100 (see OI-07). | M | US-11 | Test |
-| FR-40 | The system shall let the owner complete a session, shall store the result and shall answer with the session identifier, completion time, number of scenarios, number of correct verdicts and score (see OI-08). | M | US-11 | Test |
+| FR-39 | The system shall calculate the session score as the number of correct verdicts divided by the number of scenarios in the session, times 100, rounded half up to a whole number from 0 to 100 (D-03). | M | US-11 | Test |
+| FR-40 | The system shall let the owner complete a session, shall store the result and shall answer with the session identifier, completion time, number of scenarios, number of correct verdicts and score; while at least one scenario of the session is unanswered, the system shall answer 409, keep the session open and store no result (D-04). | M | US-11 | Test |
 | FR-41 | The system shall reject the completion of an already completed session with 409. | M | US-11 | Test |
 | FR-42 | The system shall reject the completion of another user's session with 403 and of a session that does not exist with 404. | M | US-11 | Test |
 | FR-43 | The user interface shall offer the two verdict choices *Phishing* and *Legitimate* and an optional checklist of indicators for each scenario, and shall show the feedback of FR-34 as soon as the verdict is submitted. | M | US-10 | Demonstration |
@@ -319,8 +322,8 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
 | FR-44 | The user interface shall show each scenario like a message in an email inbox: sender name, sender address, reply-to address when present, subject and body. | M | US-09 | Demonstration |
-| FR-45 | The user interface shall show every link of a scenario as its label together with its real target as text, and no link shall be clickable or lead anywhere. | M | US-09 | Test |
-| FR-46 | The user interface shall be usable at laptop width and at phone width without horizontal scrolling (see OI-09). | M | US-09 | Demonstration |
+| FR-45 | The user interface shall show every link of a scenario as its label together with its real target as text, and no link shall be clickable or lead anywhere: the shown scenario shall contain no anchor element with a target and no click or keyboard action (D-10). | M | US-09 | Test |
+| FR-46 | The user interface shall be usable without horizontal scrolling at laptop width (1366×768) and at phone width (390×844), in the browsers named in NFR-35 (D-10). | M | US-09 | Demonstration |
 | FR-47 | The user interface shall show a summary after the last scenario of a session: the score, the number of correct verdicts out of the total and which scenarios were answered wrongly. | M | US-12 | Demonstration |
 
 ### 4.6 F4.1 Score history
@@ -329,7 +332,7 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 |---|---|---|---|---|
 | FR-48 | The system shall show a logged-in user the list of their completed sessions, newest first, each with completion date and score, one page at a time. | M | US-13 | Test |
 | FR-49 | The system shall include only the caller's own sessions in the score history. | M | US-13 | Test |
-| FR-50 | The user interface shall show a trend indicator (improving, flat or declining) that compares a session's score with the previous one (see OI-10). | M | US-13 | Demonstration |
+| FR-50 | The user interface shall show a trend indicator (improving, flat or declining) for each completed session by comparing its score with the previous completed session of the same user: higher is improving, equal is flat, lower is declining; the first completed session shall show no trend (D-05). | M | US-13 | Demonstration |
 | FR-51 | The user interface shall show the score history as a chart of score over time. | C | US-13 | Demonstration |
 
 ### 4.7 F5.1 Scenario management
@@ -341,7 +344,7 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 | FR-54 | The system shall let an admin replace all fields of an existing scenario and shall answer 404 when the scenario does not exist. | M | US-14 | Test |
 | FR-55 | The system shall let an admin delete a scenario, answer 204, never offer the deleted scenario in a new session, and answer 404 when the scenario does not exist. | M | US-14 | Test |
 | FR-56 | The system shall reject a scenario that breaks the API contract (missing required field, over-length text, more than five links, unknown field) with 400 and shall store nothing. | M | US-14 | Test |
-| FR-57 | The system shall record, for every creation, change and deletion of a scenario, which admin did it, what was done and when (see OI-11). | M | US-14 | Test |
+| FR-57 | The system shall record, for every creation, change and deletion of a scenario, one audit event with the acting admin, the time, the action (create, update or delete), the scenario identifier and the names of the changed fields; a rejected request shall write no event (D-06). | M | US-14 | Test |
 | FR-58 | The user interface shall show an admin a table of all scenarios. | M | US-15 | Demonstration |
 | FR-59 | The user interface shall let an admin add and edit a scenario through a form that shows a validation message for each invalid field. | M | US-15 | Demonstration |
 | FR-60 | The user interface shall ask for confirmation before it deletes a scenario. | M | US-15 | Demonstration |
@@ -354,7 +357,7 @@ One sub-section per backlog feature (F1.1 … F7.1). Columns: **Pri** = priority
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
-| FR-65 | The system shall give an admin the total number of users, the total number of completed sessions, the average score and the five hardest scenarios, meaning those with the lowest rate of correct verdicts (see OI-12). | S | US-16 | Test |
+| FR-65 | The system shall give an admin the total number of users, the total number of completed sessions, the average score rounded to one decimal and the hardest scenarios, meaning the at most five scenarios with the lowest rate of correct verdicts among those with at least one answer, with equal rates ordered by title (D-11). | S | US-16 | Test |
 | FR-66 | The system shall return aggregate figures only in the statistics and shall not reveal the answers or scores of any single user. | S | US-16 | Test |
 | FR-67 | The user interface shall show the statistics of FR-65 to an admin on a statistics screen. | S | US-16 | Demonstration |
 
@@ -364,12 +367,12 @@ The requirements in 4.9 to 4.11 describe how the product is delivered and checke
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
-| FR-68 | The system shall start completely (user interface, API, data store and seed data) with one command from a clean checkout (see OI-13). | M | US-18 | Demonstration |
+| FR-68 | The system shall start completely (user interface, API, data store and seed data) with one command from a clean checkout; it counts as started when all three services are healthy and the liveness check answers through the public port, which shall take at most 180 seconds, image build not counted (D-15). | M | US-18 | Demonstration |
 | FR-69 | The system shall be reachable at `http://localhost:8080` after the start-up of FR-68. | M | US-18 | Demonstration |
 | FR-70 | The system shall read all secrets from a deployment configuration file that is not in the repository; the repository shall contain only an example file without real values. | M | US-18 | Inspection |
 | FR-71 | The system shall provide a liveness check that needs no login and reports that the API is running. | M | US-18 | Test |
-| FR-72 | The CI pipeline shall run the linter, the unit tests and the build on every pull request, and a pull request shall not be mergeable while a check fails (see OI-14). | M | US-19 | Inspection |
-| FR-73 | The CI pipeline shall report the unit-test coverage and shall fail when the coverage is below 50 % (see OI-14). | M | US-19, US-20 | Inspection |
+| FR-72 | The CI pipeline shall run the linter, the tests, the build and the container image build on every pull request as the required checks `lint`, `test`, `build` and `docker`, and a pull request shall not be mergeable while one of them fails (D-07). | M | US-19 | Inspection |
+| FR-73 | The CI pipeline shall report the unit-test coverage and shall fail when the line coverage of the API and the user interface together is below 50 % (D-07). | M | US-19, US-20 | Inspection |
 | FR-74 | The repository shall have automatic dependency-update checks, and the CI pipeline shall run a dependency vulnerability audit. | S | US-22 | Inspection |
 | FR-75 | The project shall generate the list of dependency licences that is used for the NOTICE file. | S | US-22 | Inspection |
 
@@ -377,26 +380,26 @@ The requirements in 4.9 to 4.11 describe how the product is delivered and checke
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
-| FR-76 | The project shall keep a test plan that states the test levels, the scope, the responsibilities and the evidence to be produced (see OI-15). | M | US-20 | Inspection |
+| FR-76 | The project shall keep a test plan that states the test levels, the scope, the responsibilities and the evidence to be produced: the test report of the CI run, the coverage artefact and a trace from each security case to its test (D-16). | M | US-20 | Inspection |
 | FR-77 | The project shall have automated unit tests for scoring and input validation and automated integration tests for authentication and for the session flow (start, answer, complete). | M | US-20 | Inspection |
 | FR-78 | The project shall have automated security tests showing that a wrong role gets 403, that the login rate limit gives 429 and that starting a session does not leak the answer key. | M | US-20 | Inspection |
-| FR-79 | The project shall run a static-analysis scan that produces the technical-debt report for the final submission (see OI-17). | S | US-23 | Inspection |
+| FR-79 | The project shall run a static-analysis scan that produces the technical-debt report for the final submission; the quality gate of NFR-30 to NFR-33 shall be reported in Sprint 3 and shall pass before the final release (D-08). | S | US-23 | Inspection |
 
 ### 4.11 F6.3 API tooling
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
 | FR-80 | The project shall provide a mock server generated from the API contract that answers every operation of the contract, so that the user interface can be built before the API is ready. | S | US-21 | Demonstration |
-| FR-81 | The CI pipeline shall lint the API contract and shall fail when the linter reports an error (see OI-16). | S | US-21 | Inspection |
+| FR-81 | The CI pipeline shall lint the API contract and shall fail when the linter reports an error; a warning shall not fail the check but is fixed or explained in the pull request (D-17). | S | US-21 | Inspection |
 
 ### 4.12 F7.1 Optional enhancements
 
 | ID | Requirement | Pri | Source | Verif. |
 |---|---|---|---|---|
-| FR-82 | The system shall let a user who forgot their password request a reset message and set a new password with it (see OI-18). | C | US-24 | Test |
-| FR-83 | The system shall deliver the reset message only to the local email stub and shall send no real email. | C | US-24 | Inspection |
-| FR-84 | The system shall accept an optional difficulty (`easy`, `medium` or `hard`) when a session is started, shall then return only scenarios of that difficulty, and shall reject any other value with 400 (see OI-19). | C | US-25 | Test |
-| FR-85 | The system shall answer 422 when fewer scenarios of the requested difficulty are available than requested (see OI-06, OI-19). | C | US-25 | Test |
+| FR-82 | The system shall let a user who forgot their password request a reset message and set a new password with it; the reset token shall be valid for 30 minutes and usable once, the answer to a reset request shall be the same for known and unknown accounts, and an invalid, expired or used token shall get 400 (D-18). | C | US-24 | Test |
+| FR-83 | The system shall deliver the reset message only to the local mailbox stub and shall send no real email. | C | US-24 | Inspection |
+| FR-84 | The system shall accept an optional difficulty (`easy`, `medium` or `hard`) when a session is started, shall then return only scenarios of that difficulty, and shall reject any other value with 400 (D-19). | C | US-25 | Test |
+| FR-85 | The system shall answer 422 when fewer scenarios of the requested difficulty are available than requested, shall create no session and shall never fill the session with other difficulties (D-14, D-19). | C | US-25 | Test |
 
 ---
 
@@ -448,7 +451,7 @@ An admin can do everything a learner can do. Every use case except UC-01, UC-02 
 | Goal | Get access to the functions of the account. |
 | Preconditions | The visitor has an account. |
 | Main flow | 1. The visitor enters username and password on the login screen. 2. The system checks the credentials. 3. The system answers 200 with an access token and its lifetime. 4. The user interface keeps the token, asks for the profile and shows the start screen for the user's role. 5. Later the user chooses *Log out*; the user interface discards the token and shows the login screen. |
-| Alternative and exception flows | **2a** Unknown user or wrong password: 401 with the same message in both cases; the form stays open. **2b** More than 5 failed logins in a minute: 429 with `Retry-After`; the form shows how long to wait. **2c** Malformed request: 400. **4a** The token has expired during later use: the next request gets 401 and the user interface returns to the login screen. **1a** (Could, US-24) The visitor chooses *Forgot password*, receives a reset message through the local email stub and sets a new password. |
+| Alternative and exception flows | **2a** Unknown user or wrong password: 401 with the same message in both cases; the form stays open. **2b** A 6th attempt after 5 failed logins in the same 60-second window (D-02): 429 with `Retry-After`; the form shows how long to wait. **2c** Malformed request: 400. **4a** The token has expired during later use: the next request gets 401 and the user interface returns to the login screen. **1a** (Could, US-24) The visitor chooses *Forgot password*, receives a reset message through the local email stub and sets a new password. |
 | Postconditions | Success: the user is logged in with the role stored for the account. After logout or expiry: the user interface holds no token. |
 | Related FRs | FR-06 … FR-10, FR-12, FR-14, FR-15, FR-82, FR-83 |
 
@@ -460,7 +463,7 @@ An admin can do everything a learner can do. Every use case except UC-01, UC-02 
 | Goal | Practise on a short round of scenarios and learn from the feedback. |
 | Preconditions | The actor is logged in. The library holds at least as many scenarios as requested. |
 | Main flow | 1. The learner chooses *Start session* (default 10 scenarios). 2. The system creates the session, picks the scenarios at random and answers 201 with the scenarios without their answer keys. 3. The user interface shows the first scenario like an inbox message. 4. The learner chooses *Phishing* or *Legitimate* and may tick indicators. 5. The system stores the answer and answers 200 with the feedback (correct or not, correct verdict, indicators, missed indicators, explanation). 6. The learner reads the feedback and goes to the next scenario; steps 3–6 repeat until the last scenario. 7. The user interface asks the system to complete the session. 8. The system calculates and stores the score and answers 200 with the result. 9. The user interface shows the session summary. |
-| Alternative and exception flows | **1a** The learner asks for another number of scenarios: 1–20 is accepted; anything else gives 400. **1b** (Could, US-25) The learner chooses a difficulty; only scenarios of that difficulty are used. **2a** Fewer scenarios available than requested: 422; no session is created; the user interface explains this. **5a** The scenario was already answered in this session: 409; the first answer stays. **5b** The session belongs to another user: 403. **5c** The session does not exist or the scenario is not part of it: 404. **5d** The session is already completed: 409. **8a** The session was already completed: 409. **8b** The session belongs to another user: 403; it does not exist: 404. |
+| Alternative and exception flows | **1a** The learner asks for another number of scenarios: 1–20 is accepted; anything else gives 400. **1b** (Could, US-25) The learner chooses a difficulty; only scenarios of that difficulty are used. **2a** Fewer scenarios available than requested: 422; no session is created; the user interface explains this. **5a** The scenario was already answered in this session: 409; the first answer stays. **5b** The session belongs to another user: 403. **5c** The session does not exist or the scenario is not part of it: 404. **5d** The session is already completed: 409. **8a** The session was already completed: 409. **8c** Scenarios are still unanswered: 409; the session stays open and no result is stored (D-04). **8b** The session belongs to another user: 403; it does not exist: 404. |
 | Postconditions | Success: the session is completed and its result is stored and appears in the history. If the learner leaves early: the given answers stay stored and the session stays open. |
 | Related FRs | FR-20, FR-25 … FR-47, FR-84, FR-85 |
 
@@ -472,7 +475,7 @@ An admin can do everything a learner can do. Every use case except UC-01, UC-02 
 | Goal | See past scores and whether they are improving. |
 | Preconditions | The actor is logged in. |
 | Main flow | 1. The learner opens the history screen. 2. The system answers 200 with the learner's completed sessions, newest first, one page at a time. 3. The user interface shows date and score for each session and a trend indicator. 4. The learner may move to the next page. |
-| Alternative and exception flows | **2a** No completed session yet: the list is empty and the screen invites the learner to start a session. **2b** Invalid paging values: 400. **3a** Only one session exists: no trend is shown (see OI-10). |
+| Alternative and exception flows | **2a** No completed session yet: the list is empty and the screen invites the learner to start a session. **2b** Invalid paging values: 400. **3a** Only one session exists: no trend is shown (D-05). |
 | Postconditions | Nothing is changed. The learner has seen only their own results. |
 | Related FRs | FR-13, FR-48 … FR-51 |
 
@@ -496,7 +499,7 @@ An admin can do everything a learner can do. Every use case except UC-01, UC-02 
 | Goal | See how learners perform overall and which scenarios are hardest. |
 | Preconditions | The actor is logged in with the role `admin`. |
 | Main flow | 1. The admin opens the statistics screen. 2. The system answers 200 with the total users, total sessions, average score and the five hardest scenarios. 3. The user interface shows the figures. |
-| Alternative and exception flows | **1a** The caller is a learner: 403. **2a** No completed session yet: the totals are zero and the list of hardest scenarios is empty. **2b** Fewer than five scenarios have answers: the list is shorter (see OI-12). |
+| Alternative and exception flows | **1a** The caller is a learner: 403. **2a** No completed session yet: the totals are zero and the list of hardest scenarios is empty. **2b** Fewer than five scenarios have answers: the list is shorter (D-11). |
 | Postconditions | Nothing is changed. No data of a single user has been shown. |
 | Related FRs | FR-11, FR-65 … FR-67 |
 
@@ -541,7 +544,7 @@ erDiagram
 | **TrainingSession** | identifier; owner (user); start time; completion time (empty while open); number of scenarios; number of correct verdicts; score (0–100) | Belongs to exactly one user. Count of correct verdicts and score are set when the session is completed and do not change afterwards. |
 | **SessionItem** | session; scenario; position in the session | One item per scenario of the session; a scenario appears at most once per session. |
 | **Answer** | session item; verdict (`phishing` or `legitimate`); flagged indicators (0–9 codes); correct (yes/no); points awarded; answer time | At most one answer per session item. An answer is never changed after it is stored. |
-| **AuditEvent** | identifier; acting admin; action (create, update, delete); scenario concerned; time; changed fields | Written for every scenario change (FR-57). Never changed or deleted through the application. The exact fields are open (OI-11). |
+| **AuditEvent** | identifier; acting admin; action (create, update, delete); scenario concerned; time; changed fields | Written for every scenario change (FR-57). Never changed or deleted through the application. Changed fields are stored as names only, without old or new values (D-06). |
 
 ### 6.2 Data retention and privacy rules
 
@@ -627,35 +630,35 @@ The check was done on this version of the document by comparing the **Source** c
 
 Priority count: 68 Must, 12 Should, 5 Could. Verification methods: 52 Test, 17 Inspection, 16 Demonstration.
 
-The check is repeated whenever a requirement or story changes (task T-58) and again against code and tests at the end of the project (task T-79).
+The check was repeated for version 1.1 (task T-58): the decisions changed wording only, so every count above is unchanged, and the stories of the refined backlog (R-11) list the same FRs as the matrix in 8.1. The check is repeated whenever a requirement or story changes and again against code and tests at the end of the project (task T-79).
 
 ---
 
-## Appendix A – Open issues
+## Appendix A – Open issues (all closed)
 
-Every open question of the Acceptance Criteria Testability Review (R-5) is listed here. The questions are decided by the Product Owner in the decision log (task T-57, `docs/process/decision-log.md`); the wording of the affected requirements is then updated in this document (task T-58). Until then, the affected requirements keep the wording of the Sprint 1 backlog.
+Every open question of the Acceptance Criteria Testability Review (R-5) is listed here. All 19 were decided by the Product Owner in the decision log (R-12, task T-57), and the wording of the affected requirements in section 4 was updated in version 1.1 of this document (task T-58). No issue is open. The list is kept so that the identifiers `OI-xx` used in other documents can still be found.
 
-| ID | Story | Open question | Affected FRs | Decision owner | Status |
+| ID | Story | Question | Affected FRs | Raised with (consulted) | Status |
 |---|---|---|---|---|---|
-| OI-01 | US-01 | What exactly is a "clear reason" in a validation error (stable code or field list), and how is it verified that passwords never appear in responses and logs? | FR-04, FR-05 | Product Owner + Lead Architect | Open |
-| OI-02 | US-02 | Is logout only the client discarding its token, or does the server invalidate the token? How long is a token valid? | FR-06, FR-10 | Product Owner + Lead Architect | Open |
-| OI-03 | US-04 | Which attempt triggers the limit (the sixth?), is the minute a fixed or a rolling window, and are the limits per client address and per account independent? | FR-14, FR-15 | Lead Architect | Open |
-| OI-04 | US-06 | What are the exact counts behind "about 60 %" phishing and the mix of difficulties in the seed library? | FR-21 | Product Owner | Open |
-| OI-05 | US-07 | Which source is the canonical list of indicator codes, and must every code have a unique, non-empty description in both the user interface and the API? | FR-25, FR-26 | Product Owner | Open |
-| OI-06 | US-08 | How can random scenario selection be made repeatable for tests, and is the 422 rule applied to the pool of the selected difficulty? | FR-30, FR-32, FR-85 | Lead Architect | Open |
-| OI-07 | US-11 | Which rounding rule applies to the score when the result ends in .5? | FR-39 | Product Owner + Lead Architect | Open |
-| OI-08 | US-11 | What happens when a session is completed while scenarios are still unanswered? | FR-40 | Product Owner + Lead Architect | Open |
-| OI-09 | US-09 | Which viewports and browsers stand for "laptop and phone widths", and how is "not clickable" checked? | FR-45, FR-46 | Requirements & UX Engineer | Open |
-| OI-10 | US-13 | What are the rules for improving / flat / declining, and what is shown for the first session? | FR-50 | Product Owner | Open |
-| OI-11 | US-14 | Which audit events are recorded and with which fields (actor, time, action, resource, changed fields)? The current response schema holds only creator and creation time. | FR-57 | Lead Architect | Open |
-| OI-12 | US-16 | How is the average rounded, how are ties among the hardest scenarios broken, and what is returned when fewer than five scenarios have answers? | FR-65 | Product Owner | Open |
-| OI-13 | US-18 | When does the system count as started (health checks), and what is the longest acceptable start-up time on a clean machine? | FR-68, FR-71 | DevOps Engineer | Open |
-| OI-14 | US-19 | Which coverage metric is used for the 50 % gate, and what are the exact names of the required checks? | FR-72, FR-73 | DevOps Engineer + QA Engineer | Open |
-| OI-15 | US-20 | Which test tools, which scope and which form of evidence (CI report, coverage artefact, trace to the security cases) are required? | FR-76, FR-77, FR-78 | QA Engineer | Open |
-| OI-16 | US-21 | Which contract linter is used, and what is the pass rule (zero errors; how are warnings handled)? | FR-81 | Lead Architect | Open |
-| OI-17 | US-23 | Which fields must the static-analysis report contain, and does a failed quality gate block the final submission? | FR-79 | QA Engineer + Lead Architect | Open |
-| OI-18 | US-24 | How is the reset message delivered by the stub, how long is a reset token valid, is it single-use, and what is answered for an invalid token? | FR-82, FR-83 | Product Owner | Open |
-| OI-19 | US-25 | Must every returned scenario match the requested difficulty, is an invalid value a 400, and what is answered when the pool is too small? | FR-84, FR-85 | Product Owner + QA Engineer | Open |
+| OI-01 | US-01 | What exactly is a "clear reason" in a validation error (stable code or field list), and how is it verified that passwords never appear in responses and logs? | FR-04, FR-05 | Product Owner + Lead Architect | Closed by D-12 |
+| OI-02 | US-02 | Is logout only the client discarding its token, or does the server invalidate the token? How long is a token valid? | FR-06, FR-10 | Product Owner + Lead Architect | Closed by D-01 |
+| OI-03 | US-04 | Which attempt triggers the limit (the sixth?), is the minute a fixed or a rolling window, and are the limits per client address and per account independent? | FR-14, FR-15 | Lead Architect | Closed by D-02 |
+| OI-04 | US-06 | What are the exact counts behind "about 60 %" phishing and the mix of difficulties in the seed library? | FR-21 | Product Owner | Closed by D-09 |
+| OI-05 | US-07 | Which source is the canonical list of indicator codes, and must every code have a unique, non-empty description in both the user interface and the API? | FR-25, FR-26 | Product Owner | Closed by D-13 |
+| OI-06 | US-08 | How can random scenario selection be made repeatable for tests, and is the 422 rule applied to the pool of the selected difficulty? | FR-30, FR-32, FR-85 | Lead Architect | Closed by D-14 |
+| OI-07 | US-11 | Which rounding rule applies to the score when the result ends in .5? | FR-39 | Product Owner + Lead Architect | Closed by D-03 |
+| OI-08 | US-11 | What happens when a session is completed while scenarios are still unanswered? | FR-40 | Product Owner + Lead Architect | Closed by D-04 |
+| OI-09 | US-09 | Which viewports and browsers stand for "laptop and phone widths", and how is "not clickable" checked? | FR-45, FR-46 | Requirements & UX Engineer | Closed by D-10 |
+| OI-10 | US-13 | What are the rules for improving / flat / declining, and what is shown for the first session? | FR-50 | Product Owner | Closed by D-05 |
+| OI-11 | US-14 | Which audit events are recorded and with which fields (actor, time, action, resource, changed fields)? The current response schema holds only creator and creation time. | FR-57 | Lead Architect | Closed by D-06 |
+| OI-12 | US-16 | How is the average rounded, how are ties among the hardest scenarios broken, and what is returned when fewer than five scenarios have answers? | FR-65 | Product Owner | Closed by D-11 |
+| OI-13 | US-18 | When does the system count as started (health checks), and what is the longest acceptable start-up time on a clean machine? | FR-68, FR-71 | DevOps Engineer | Closed by D-15 |
+| OI-14 | US-19 | Which coverage metric is used for the 50 % gate, and what are the exact names of the required checks? | FR-72, FR-73 | DevOps Engineer + QA Engineer | Closed by D-07 |
+| OI-15 | US-20 | Which test tools, which scope and which form of evidence (CI report, coverage artefact, trace to the security cases) are required? | FR-76, FR-77, FR-78 | QA Engineer | Closed by D-16 |
+| OI-16 | US-21 | Which contract linter is used, and what is the pass rule (zero errors; how are warnings handled)? | FR-81 | Lead Architect | Closed by D-17 |
+| OI-17 | US-23 | Which fields must the static-analysis report contain, and does a failed quality gate block the final submission? | FR-79 | QA Engineer + Lead Architect | Closed by D-08 |
+| OI-18 | US-24 | How is the reset message delivered by the stub, how long is a reset token valid, is it single-use, and what is answered for an invalid token? | FR-82, FR-83 | Product Owner | Closed by D-18 |
+| OI-19 | US-25 | Must every returned scenario match the requested difficulty, is an invalid value a 400, and what is answered when the pool is too small? | FR-84, FR-85 | Product Owner + QA Engineer | Closed by D-19 |
 
 The review's finding for US-11 holds two separate questions (rounding and incomplete completion); they are listed as OI-07 and OI-08 so that each can be closed by one decision.
 
@@ -664,3 +667,4 @@ The review's finding for US-11 holds two separate questions (rounding and incomp
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-15 | Duhan Kaan Şenol | First version for Sprint 2 (task T-53). |
+| 1.1 | 2026-11-15 | Duhan Kaan Şenol | Decisions D-01 … D-19 applied (task T-58): wording of FR-04 … FR-06, FR-10, FR-14, FR-15, FR-21, FR-25, FR-26, FR-30, FR-32, FR-39, FR-40, FR-45, FR-46, FR-50, FR-57, FR-65, FR-68, FR-72, FR-73, FR-76, FR-79, FR-81 … FR-85 adjusted; use cases UC-02, UC-03, UC-04 and UC-06 and the AuditEvent entity aligned; open issues OI-01 … OI-19 set to *Closed by D-xx*; references R-11 and R-12 added. No requirement was added or removed, and no priority or verification method changed. |
