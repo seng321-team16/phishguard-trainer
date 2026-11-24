@@ -23,13 +23,10 @@ coverage
 
 # Not needed to build or run the application
 docs
-playbook
 e2e
 design
 .git
 .github
-.claude
-.autopilot
 .vscode
 .idea
 *.log
