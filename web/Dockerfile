@@ -20,7 +20,7 @@ COPY web web
 RUN npm run build --workspace @phishguard/web
 
 # ---------- runtime stage: nginx with the static files only ----------
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.30-alpine AS runtime
 
 # Our configuration replaces the stock one (which expects to run as root on port 80).
 RUN rm -f /etc/nginx/conf.d/default.conf
