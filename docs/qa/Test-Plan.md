@@ -111,7 +111,7 @@ All tools are those of ADR-0001 (testing, lint and contract tooling, CI and stat
 | `npm audit` | Vulnerability audit of the production dependencies | CI | Yes |
 | GitHub secret scanning | Secrets in the repository history | GitHub, every push | – (repository setting) |
 | Docker Compose, shell, `curl` | Clean start, restart check, port inspection | Local, CI Docker job | Yes |
-| GitHub Actions | Runs the jobs `lint`, `test`, `build`, `docker` on every pull request (from T-44) | CI | Yes |
+| GitHub Actions | Runs six jobs on every pull request: `lint`, `test`, `build`, `docker` (required by D-07, from T-44), `audit` (added by T-49) and `e2e` (added by T-47) | CI | Yes |
 | GitHub Issues | Defect tracking (section 13) | GitHub | – |
 
 **k6 or autocannon.** The task allowed either. k6 is chosen because NFR-03 needs a scripted user flow (log in, start a session, ten answers, complete) with a separate 95th percentile for each of the three operations and pass/fail thresholds. autocannon measures one URL at a time and cannot keep the session state between calls without extra code. k6 runs from its official container, so nothing is installed with npm. k6 is licensed under AGPL-3.0; it is used only as an external tool and is not distributed with the product (the same position as SonarQube in ADR-0001). `@axe-core/playwright` (MPL-2.0) is a development dependency of the `e2e` workspace only and appears in the licence report of T-49.
@@ -167,7 +167,7 @@ flowchart TB
 | Environment | What runs | Database | Used for | Started with |
 |---|---|---|---|---|
 | **Local** | Vitest in the developer's checkout (Node.js 20). API tests call the Express app in-process through Supertest; web tests run in jsdom. | None for unit and component tests. Integration tests use the `db-test` container. | Unit, component and integration tests while developing | `npm test`, `npm run test:coverage` |
-| **CI** | GitHub Actions on an Ubuntu runner, from T-44. Jobs `lint`, `test`, `build`, `docker` (D-07). | A PostgreSQL 16 service equal to `db-test`, empty at the start of every run | The gate for every pull request: lint, contract lint, unit and integration tests with the coverage gate, build, image build, dependency audit | Automatically on every pull request and on every push to `develop` and `main` |
+| **CI** | GitHub Actions on an Ubuntu runner, from T-44. Six jobs: `lint`, `test`, `build`, `docker` (required by D-07), `audit` (added by T-49) and `e2e` (added by T-47). | A PostgreSQL 16 service equal to `db-test`, empty at the start of every run | The gate for every pull request: lint, contract lint, unit and integration tests with the coverage gate, build, image build, dependency audit | Automatically on every pull request and on every push to `develop` and `main` |
 | **Compose test profile** | Only the disposable database `db-test` of `docker-compose.yml`: PostgreSQL 16 on `127.0.0.1:5433`, its own credentials, storage in memory (`tmpfs`), so every start is an empty database | `db-test` | Integration tests on a developer machine, without touching the data of the normal stack | `docker compose --profile test up -d db-test` |
 | **Full Compose stack** ("demo laptop") | `db`, `api`, `web` (nginx) from the production images at `http://localhost:8080`, with the seed library and the bootstrap admin from `.env` | `db` with the named volume `db-data` | End-to-end, accessibility, smoke, restart, performance and usability tests | `docker compose up -d --wait` |
 
@@ -331,7 +331,7 @@ One row per non-functional requirement of the NFR document. *Level* uses the lev
 
 | NFR | What is verified (target) | Level | Tool | Location (planned) | Task | Milestone |
 |---|---|---|---|---|---|---|
-| NFR-29 | Unit-test line coverage, `api` + `web` (≥ 50 %); pipeline fails below | Unit | Vitest, `@vitest/coverage-v8` (lcov) | `coverage/api`, `coverage/web`; thresholds in `api/vitest.config.ts` and `web/vite.config.ts`; report of T-70 | T-45, T-70 | S3 required; F required |
+| NFR-29 | Unit-test line coverage, `api` + `web` (≥ 50 %); pipeline fails below | Unit | Vitest, `@vitest/coverage-v8` (lcov) | `coverage/api`, `coverage/web`; thresholds in `api/vitest.config.ts` and `web/vitest.config.ts`; report of T-70 | T-45, T-70 | S3 required; F required |
 | NFR-30 | Open blocker and critical issues (0) | Static analysis | SonarQube Community, `sonar-scanner` | `sonar-project.properties`; SonarQube report of T-50 | T-50, T-75 | S3 reported; F required |
 | NFR-31 | Duplicated lines (≤ 3 %) | Static analysis | SonarQube | SonarQube report of T-50 | T-50, T-75 | S3 reported; F required |
 | NFR-32 | Maintainability rating (A) | Static analysis | SonarQube | SonarQube report of T-50 | T-50, T-75 | S3 reported; F required |
@@ -450,9 +450,9 @@ A test case may be implemented by several `it(...)` blocks; each carries the cri
 | TC-71 | US-18 | AC-18.2 | On the started stack the bootstrap admin logs in and a session with seed scenarios starts | End-to-end | Yes (Final); demonstration at Sprint 3 | `e2e/tests/` `admin-scenarios.spec.ts`, `e2e/tests/` `learner-journey.spec.ts` · T-47 |
 | TC-72 | US-18 | AC-18.3 | `GET /api/v1/health` without a token → 200 and `status` `ok` | Unit (in-process HTTP) | Yes | `api/src/app.test.ts` · exists since T-63 |
 | TC-73 | US-18 | AC-18.4 | No secret in the repository; `.env` not tracked; `.env.example` without real values | Static analysis, Review (inspection) | Partly (secret scanning automatic; inspection by a person) | GitHub security tab; `git ls-files .env` · T-76 |
-| TC-74 | US-19 | AC-19.1 | A pull request runs the jobs `lint`, `test`, `build`, `docker` | Review (demonstration) | No | CI run of a pull request, linked in the Sprint 3 report · T-44, T-70 |
-| TC-75 | US-19 | AC-19.2 | The four jobs are required status checks; a failing job blocks the merge | Review (inspection) | No | Branch-protection settings of the official repository · T-44, T-71 |
-| TC-76 | US-19 | AC-19.3 | Line coverage per workspace and combined is reported (lcov artefact); the `test` job fails below 50 %; exclusions follow D-07 | Review (inspection of configuration and CI run) | Partly (the gate itself is automatic) | `api/vitest.config.ts`, `web/vite.config.ts`, CI workflow · T-45; coverage report · T-70 |
+| TC-74 | US-19 | AC-19.1 | A pull request runs the six jobs of the workflow: `lint`, `test`, `build`, `docker` (D-07), `audit` (T-49) and `e2e` (T-47) | Review (demonstration) | No | CI run of a pull request, linked in the Sprint 3 report · T-44, T-70 |
+| TC-75 | US-19 | AC-19.2 | The four jobs of D-07 (`lint`, `test`, `build`, `docker`) are required status checks, and so are `audit` and `e2e`, which the workflow header also names for the branch protection; a failing job blocks the merge | Review (inspection) | No | Branch-protection settings of the official repository · T-44, T-71 |
+| TC-76 | US-19 | AC-19.3 | Line coverage per workspace and combined is reported (lcov artefact); the `test` job fails below 50 %; exclusions follow D-07 | Review (inspection of configuration and CI run) | Partly (the gate itself is automatic) | `api/vitest.config.ts`, `web/vitest.config.ts`, CI workflow · T-45; coverage report · T-70 |
 | TC-77 | US-20 | AC-20.1 | The test plan states levels, scope, responsibilities, evidence and the ADR-0001 tools | Review (inspection) | No | This document, sections 3, 4, 5, 14, 15 · T-64 |
 | TC-78 | US-20 | AC-20.2 | Unit tests for scoring and validation and integration tests for authentication and the session flow exist and pass in CI | Review of the CI test report | Partly (the tests are automatic) | TC-43 (scoring), TC-03, TC-20 (validation), TC-06 … TC-09 (authentication), TC-27, TC-36, TC-42 (session flow); report · T-70, T-74 |
 | TC-79 | US-20 | AC-20.3 | The three security cases are linked to their test files, and the tests pass in CI | Review (inspection) and CI | Partly (the tests are automatic) | Section 9.2 of this document; TC-11, TC-15, TC-30 · T-64, T-70 |
@@ -516,7 +516,7 @@ Section 11 gives the detail for the Must stories. This table covers all stories,
 | US-16 | S | Average rounding, hardest scenarios and ties (D-11), aggregates only, learner gets 403 | – (written with the story) | T-38, T-39, T-74 |
 | US-17 | M | Bootstrap creates one admin once; nothing without values; no default password | TC-65 … TC-69 | T-40, T-71 |
 | US-18 | M | Clean start in 180 s, working application, health check, no secrets | TC-70 … TC-73 | T-43, T-47 |
-| US-19 | M | Four jobs, required checks, coverage gate | TC-74 … TC-76 | T-44, T-45 |
+| US-19 | M | Six jobs (four of D-07, `audit`, `e2e`), required checks, coverage gate | TC-74 … TC-76 | T-44, T-45 |
 | US-20 | M | Test plan content, required tests, security-case trace, evidence | TC-77 … TC-80 | T-64, T-70, T-74, T-47 |
 | US-21 | S | Spectral zero errors (D-17), mock answers 14 of 14 operations | – (NFR-05) | T-48 (done), T-44 |
 | US-22 | S | Dependabot configured, `npm audit` gate, licence list | – (NFR-26) | T-49 |
