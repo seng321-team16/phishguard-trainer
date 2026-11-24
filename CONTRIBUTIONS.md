@@ -23,6 +23,7 @@ Each member maintains their own section through a pull request, so that every en
 
 
 **Work completed (Sprint 2)**
+Sprint 2: monorepo skeleton, multi-stage Docker and compose stack (db, api, web), Prisma migrate and seed, OpenAPI mock and lint, C4 and UML architecture documents, ADR records.
 - Pull requests authored:
   - [#67](https://github.com/seng321-team16/phishguard-trainer/pull/67) feat(db): add users table, initial migration and user repository [T-01]
   - [#65](https://github.com/seng321-team16/phishguard-trainer/pull/65) build(docker): add multi-stage Dockerfiles and nginx config [T-41]
