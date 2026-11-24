@@ -85,3 +85,11 @@ Evaluated the responsibilities and RACI assignments of all team members (`docs/s
 | Issues | [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30), [US-20 #22](https://github.com/seng321-team16/phishguard-trainer/issues/22), [US-23 #25](https://github.com/seng321-team16/phishguard-trainer/issues/25), [US-25 #27](https://github.com/seng321-team16/phishguard-trainer/issues/27) |
 | Pull requests (authored / reviewed) | Authored: [PR #31](https://github.com/seng321-team16/phishguard-trainer/pull/31); reviewed: pending an available teammate PR |
 | Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz) |
+
+**Work completed (Sprint 2)**
+- Pull requests authored:
+  - [#63](https://github.com/seng321-team16/phishguard-trainer/pull/63) docs(qa): update test plan with tooling and NFR verification matrix [T-64]
+- Pull requests reviewed: [#61](https://github.com/seng321-team16/phishguard-trainer/pull/61), [#59](https://github.com/seng321-team16/phishguard-trainer/pull/59)
+- Issues:
+  - [#62](https://github.com/seng321-team16/phishguard-trainer/issues/62) [T-64] Update the test plan with tooling and NFR verification
+- Commits: [all my commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz)
