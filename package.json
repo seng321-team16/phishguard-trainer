@@ -17,16 +17,21 @@
   "scripts": {
     "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @phishguard/api\" \"npm run dev -w @phishguard/web\"",
     "lint": "eslint .",
+    "lint:api": "spectral lint api/openapi.yaml --fail-severity error",
     "format": "prettier --write \"*.{js,json}\" \".prettierrc\" \"{api,web,packages}/**/*.{ts,tsx,js,json,css,html}\" \"!packages/contract/src/schema.d.ts\"",
     "format:check": "prettier --check \"*.{js,json}\" \".prettierrc\" \"{api,web,packages}/**/*.{ts,tsx,js,json,css,html}\" \"!packages/contract/src/schema.d.ts\"",
     "test": "npm run test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "gen:contract": "npm run gen -w @phishguard/contract"
+    "gen:contract": "npm run gen -w @phishguard/contract",
+    "mock:spec": "node --input-type=commonjs -e \"const fs=require('fs');fs.mkdirSync('node_modules/.cache/phishguard',{recursive:true});fs.writeFileSync('node_modules/.cache/phishguard/openapi.mock.yaml',fs.readFileSync('api/openapi.yaml','utf8').replace(/^  [/]/gm,'  /api/v1/'))\"",
+    "mock": "npm run mock:spec && prism mock node_modules/.cache/phishguard/openapi.mock.yaml --port 4010"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@stoplight/prism-cli": "^5.15.11",
+    "@stoplight/spectral-cli": "^6.17.1",
     "concurrently": "^10.0.7",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
