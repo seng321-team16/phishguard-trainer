@@ -1,0 +1,32 @@
+// PhishGuard Trainer – database schema (PostgreSQL 16).
+// Change the schema only together with a new migration: `npm run db:migrate -w @phishguard/api`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Matches the `Role` schema in api/openapi.yaml.
+enum Role {
+  learner
+  admin
+}
+
+/// An account. `email` is always stored lower-cased (the repository normalises it and the
+/// database rejects anything else), so the unique index also catches "A@x.test" vs "a@x.test".
+/// `passwordHash` holds the Argon2id hash only; the password itself is never stored.
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique @db.VarChar(32)
+  email        String   @unique @db.VarChar(254)
+  passwordHash String   @map("password_hash")
+  role         Role     @default(learner)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("users")
+}

@@ -1,13 +1,16 @@
 openapi: 3.1.0
 info:
   title: PhishGuard Trainer API
-  version: 0.1.0
+  version: 0.2.0
   summary: REST contract for a phishing-awareness simulator (no real email is ever sent).
   description: |
     Learners practise judging fake emails and receive feedback. Admins manage scenarios.
     Security notes: bearer-token auth, role checks on every operation, strict input validation,
     and rate limiting (HTTP 429 with Retry-After). The scenario answer key is withheld until
     an answer is submitted.
+  contact:
+    name: SENG 321 Team 16
+    url: https://github.com/seng321-team16/phishguard-trainer
   license:
     name: Apache 2.0
     identifier: Apache-2.0
@@ -16,17 +19,38 @@ servers:
     description: Local docker-compose
 tags:
   - name: Auth
+    description: Registration, login and the profile of the current user
   - name: Training
+    description: Training sessions and answers
   - name: Results
+    description: Score history of the current user
   - name: Admin
+    description: Scenario management and statistics (admin role only)
+  - name: System
+    description: Operational endpoints
 security:
   - bearerAuth: []
 paths:
+  /health:
+    get:
+      tags: [System]
+      operationId: getHealth
+      summary: Liveness probe (no authentication)
+      description: Returns a fixed body while the API process is running. Used by Docker health checks; needs no token.
+      security: []
+      responses:
+        '200':
+          description: The API process is up
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Health' }
+              example: { status: ok }
   /auth/register:
     post:
       tags: [Auth]
       operationId: registerUser
       summary: Create a learner account
+      description: Creates an account with the learner role. The password is never returned. A username or email that is already taken gives 409.
       security: []
       requestBody:
         required: true
@@ -48,6 +72,7 @@ paths:
       tags: [Auth]
       operationId: login
       summary: Exchange credentials for an access token
+      description: Checks the username and password and returns a bearer token. An unknown user and a wrong password give the same 401 response.
       security: []
       requestBody:
         required: true
@@ -68,6 +93,7 @@ paths:
       tags: [Auth]
       operationId: getCurrentUser
       summary: Current user profile
+      description: Returns the profile of the user the bearer token belongs to.
       responses:
         '200':
           description: Profile
@@ -80,6 +106,7 @@ paths:
       tags: [Training]
       operationId: startSession
       summary: Start a training session with a random set of scenarios
+      description: Creates a session for the caller and returns its scenarios without the answer key. The request body is optional.
       requestBody:
         required: false
         content:
@@ -103,12 +130,14 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: "about:blank", title: Unprocessable Content, status: 422, detail: "Not enough scenarios are available for this request" }
         '429': { $ref: '#/components/responses/TooManyRequests' }
   /sessions/{sessionId}/answers:
     post:
       tags: [Training]
       operationId: submitAnswer
       summary: Submit a verdict for one scenario and receive feedback
+      description: Records the verdict of the caller for one scenario of their own session and returns the answer key for that scenario.
       parameters:
         - $ref: '#/components/parameters/SessionId'
       requestBody:
@@ -132,11 +161,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: "about:blank", title: Conflict, status: 409, detail: "This scenario has already been answered" }
   /sessions/{sessionId}/complete:
     post:
       tags: [Training]
       operationId: completeSession
       summary: Finish the session and get the final score
+      description: Closes a session of the caller and returns the final score. A completed session cannot be completed again.
       parameters:
         - $ref: '#/components/parameters/SessionId'
       responses:
@@ -153,11 +184,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: "about:blank", title: Conflict, status: 409, detail: "This session has already been completed" }
   /me/results:
     get:
       tags: [Results]
       operationId: listMyResults
       summary: Score history of the current user (newest first)
+      description: Returns the completed sessions of the caller, newest first, one page at a time.
       parameters:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
@@ -180,6 +213,7 @@ paths:
       tags: [Admin]
       operationId: adminListScenarios
       summary: List all scenarios including answer keys (admin only)
+      description: Returns one page of the scenario library with the answer keys. Requires the admin role.
       parameters:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Offset'
@@ -202,6 +236,7 @@ paths:
       tags: [Admin]
       operationId: adminCreateScenario
       summary: Create a scenario (admin only)
+      description: Adds a scenario to the library. Requires the admin role.
       requestBody:
         required: true
         content:
@@ -223,6 +258,7 @@ paths:
       tags: [Admin]
       operationId: adminGetScenario
       summary: Get one scenario with answer key (admin only)
+      description: Returns one scenario with its answer key. Requires the admin role.
       responses:
         '200':
           description: Scenario
@@ -236,6 +272,7 @@ paths:
       tags: [Admin]
       operationId: adminUpdateScenario
       summary: Replace a scenario (admin only)
+      description: Replaces every field of an existing scenario. Requires the admin role.
       requestBody:
         required: true
         content:
@@ -255,6 +292,7 @@ paths:
       tags: [Admin]
       operationId: adminDeleteScenario
       summary: Delete a scenario (admin only)
+      description: Removes a scenario from the library. Requires the admin role.
       responses:
         '204': { description: Deleted }
         '401': { $ref: '#/components/responses/Unauthorized' }
@@ -265,6 +303,7 @@ paths:
       tags: [Admin]
       operationId: adminGetStats
       summary: Aggregate statistics (admin only)
+      description: Returns totals and the scenarios that learners get wrong most often. Requires the admin role.
       responses:
         '200':
           description: Aggregates only, no per-user answer detail
@@ -310,31 +349,43 @@ components:
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Unauthorized, status: 401, detail: "Invalid credentials" }
     Forbidden:
       description: Authenticated but not allowed (wrong role or not the resource owner)
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Forbidden, status: 403, detail: "You are not allowed to do this" }
     NotFound:
       description: Resource does not exist (or is not visible to the caller)
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Not Found, status: 404, detail: "Resource not found" }
     Conflict:
       description: Resource already exists
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Conflict, status: 409, detail: "Username or email is already in use" }
     TooManyRequests:
       description: Rate limit exceeded
       headers:
         Retry-After:
-          description: Seconds until the caller may retry
+          description: Seconds until the caller may retry (always a whole number of seconds, never an HTTP date)
           schema: { type: integer, minimum: 0 }
+          example: 60
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: "about:blank", title: Too Many Requests, status: 429, detail: "Too many requests, try again later" }
   schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
     Problem:
       type: object
       required: [title, status]

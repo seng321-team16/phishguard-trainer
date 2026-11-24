@@ -21,6 +21,34 @@ Each member maintains their own section through a pull request, so that every en
 - Pull requests: authored [#1](https://github.com/seng321-team16/phishguard-trainer/pull/1), [#2](https://github.com/seng321-team16/phishguard-trainer/pull/2); reviewed [#31](https://github.com/seng321-team16/phishguard-trainer/pull/31)
 - Issues: [stories assigned to me](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+assignee%3Adalikaan)
 
+
+**Work completed (Sprint 2)**
+Sprint 2: monorepo skeleton, multi-stage Docker and compose stack (db, api, web), Prisma migrate and seed, OpenAPI mock and lint, C4 and UML architecture documents, ADR records.
+- Pull requests authored:
+  - [#67](https://github.com/seng321-team16/phishguard-trainer/pull/67) feat(db): add users table, initial migration and user repository [T-01]
+  - [#65](https://github.com/seng321-team16/phishguard-trainer/pull/65) build(docker): add multi-stage Dockerfiles and nginx config [T-41]
+  - [#61](https://github.com/seng321-team16/phishguard-trainer/pull/61) build(contract): add Prism mock server and Spectral contract lint [T-48]
+  - [#59](https://github.com/seng321-team16/phishguard-trainer/pull/59) build(compose): add docker compose stack with db, api, web and seeding hook [T-42]
+  - [#46](https://github.com/seng321-team16/phishguard-trainer/pull/46) docs(architecture): add UML use case, class, ER, sequence and state diagrams [T-61]
+  - [#44](https://github.com/seng321-team16/phishguard-trainer/pull/44) docs(architecture): add C4 architecture documentation [T-55]
+  - [#42](https://github.com/seng321-team16/phishguard-trainer/pull/42) build(repo): add npm workspaces skeleton for api, web and contract [T-63]
+  - [#40](https://github.com/seng321-team16/phishguard-trainer/pull/40) docs(adr): add ADRs for stack, API-first contract and JWT auth [T-62]
+- Pull requests reviewed: [#71](https://github.com/seng321-team16/phishguard-trainer/pull/71), [#70](https://github.com/seng321-team16/phishguard-trainer/pull/70), [#57](https://github.com/seng321-team16/phishguard-trainer/pull/57), [#56](https://github.com/seng321-team16/phishguard-trainer/pull/56), [#54](https://github.com/seng321-team16/phishguard-trainer/pull/54), [#52](https://github.com/seng321-team16/phishguard-trainer/pull/52), [#50](https://github.com/seng321-team16/phishguard-trainer/pull/50), [#49](https://github.com/seng321-team16/phishguard-trainer/pull/49), [#48](https://github.com/seng321-team16/phishguard-trainer/pull/48)
+- Issues:
+  - [#66](https://github.com/seng321-team16/phishguard-trainer/issues/66) [T-01] Design the users table and first Prisma migration
+  - [#64](https://github.com/seng321-team16/phishguard-trainer/issues/64) [T-41] Write multi-stage Dockerfiles for api and web
+  - [#60](https://github.com/seng321-team16/phishguard-trainer/issues/60) [T-48] Configure the OpenAPI mock server and contract lint
+  - [#58](https://github.com/seng321-team16/phishguard-trainer/issues/58) [T-42] Write docker-compose configuration with database and seeding hook
+  - [#45](https://github.com/seng321-team16/phishguard-trainer/issues/45) [T-61] Write the UML models
+  - [#43](https://github.com/seng321-team16/phishguard-trainer/issues/43) [T-55] Write the C4 architecture documentation
+  - [#41](https://github.com/seng321-team16/phishguard-trainer/issues/41) [T-63] Create the monorepo skeleton (api, web, contract) with tooling
+  - [#39](https://github.com/seng321-team16/phishguard-trainer/issues/39) [T-62] Record the technology stack and architecture style (ADR-0001)
+  - [#20](https://github.com/seng321-team16/phishguard-trainer/issues/20) [US-18] One-command Docker deployment
+  - [#16](https://github.com/seng321-team16/phishguard-trainer/issues/16) [US-14] Scenario data model and CRUD API
+  - [#4](https://github.com/seng321-team16/phishguard-trainer/issues/4) [US-02] Log in and out
+  - [#3](https://github.com/seng321-team16/phishguard-trainer/issues/3) [US-01] Register an account
+- Commits: [all my commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=dalikaan)
+
 ## Murat Yatağan
 
 | Field | Content |
@@ -29,10 +57,17 @@ Each member maintains their own section through a pull request, so that every en
 | GitHub username | myatagan |
 | Role | Product Owner |
 | Responsibilities | Product vision, backlog ownership and prioritisation, acceptance sign-off, scenario content, administrator statistics |
+**Work completed (Sprint 1)**
+Evaluated the responsibilities and RACI assignments of all team members (`docs/sprint-1/04`) and applied necessary corrections.
+- Reviewed and prioritized the initial product backlog (`docs/sprint-1/06`) across Must/Should/Could categories (`US-01` to `US-25`) to define the Sprint 3 MVP scope[cite: 1, 2, 3].
+- Defined product vision, scope boundaries, and domain constraints (simulator-only architecture, fictional brands/reserved domains, and seed scenario distribution)[cite: 2, 6, 9].
 
-**Work completed:** _to be added by the member through a pull request, with links_
-- Responsibilities of all partipipants were evaluated and necessary corrections made.
-
+**Work completed (Sprint 2)**
+- Reviewed the Software Requirements Specification (`01-Software-Requirements-Specification.pdf`) against product vision and acceptance criteria[cite: 2].
+- Resolved open Product Owner specification decisions (`OI-01`, `OI-02`, `OI-04`, `OI-05`, `OI-07`, `OI-08`, `OI-10`, `OI-12`, `OI-18`, `OI-19`) in the Decision Log (`docs/process/decision-log.md`, task `T-57`) covering seed scenario ratios, indicator vocabulary, scoring/trend rules, and admin statistics[cite: 21, 22].
+- Prepared and validated the seed scenario library content (30+ phishing and legitimate scenarios with indicators and explanations)[cite: 9, 10].
+- Pull requests: authored [#<PR_NO>](https://github.com/seng321-team16/phishguard-trainer/pull/<PR_NO>); reviewed [#<PR_NO>](https://github.com/seng321-team16/phishguard-trainer/pull/<PR_NO>)
+- Issues & Commits: [Assigned issues](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+assignee%3Amyatagan) · [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=myatagan)
 ## Furkan Berkay Öztürk
 
 | Field | Content |
@@ -52,6 +87,26 @@ Each member maintains their own section through a pull request, so that every en
 -GitHub Projects board: https://github.com/orgs/seng321-team16/projects/1
 -Document 05 update: https://github.com/seng321-team16/phishguard-trainer/pull/33
 -Sprint 1 issue tracking: Issue #28, Issue #30
+
+
+**Work completed (Sprint 2):**
+
+- Managed and updated the GitHub Projects Sprint Board, monitoring task progress and moving completed issues to the Done column.
+- Coordinated Sprint 2 task progress, pull request reviews, merge operations and team communication.
+- Reviewed and approved the T-64 Test Plan pull request (#63).
+- Merged the T-61 UML Models pull request (#46) and updated its status on the Sprint Board.
+- Created the T-66 Sprint 2 submission issue (#68) and its feature branch.
+- Prepared the Sprint 2 submission document in Markdown and PDF formats, including team responsibilities, deliverable links, issue and pull request references, review records, Figma prototype links and the planned v0.2.0 release link.
+- Created the T-66 pull request (#75), which was successfully merged into the develop branch.
+- Initiated asynchronous stand-up and retrospective discussions to collect team progress, impediments and improvement suggestions for T-52-S2.
+
+**Contribution evidence:**
+
+- GitHub Projects board: https://github.com/orgs/seng321-team16/projects/1
+- T-61 UML Models merge: https://github.com/seng321-team16/phishguard-trainer/pull/46
+- T-64 Test Plan review: https://github.com/seng321-team16/phishguard-trainer/pull/63
+- T-66 Submission Issue: https://github.com/seng321-team16/phishguard-trainer/issues/68
+- T-66 Submission PR: https://github.com/seng321-team16/phishguard-trainer/pull/75
 
 ## Duhan Kaan Şenol
 
@@ -78,3 +133,11 @@ Each member maintains their own section through a pull request, so that every en
 | Issues | [QA task #30](https://github.com/seng321-team16/phishguard-trainer/issues/30), [US-20 #22](https://github.com/seng321-team16/phishguard-trainer/issues/22), [US-23 #25](https://github.com/seng321-team16/phishguard-trainer/issues/25), [US-25 #27](https://github.com/seng321-team16/phishguard-trainer/issues/27) |
 | Pull requests (authored / reviewed) | Authored: [PR #31](https://github.com/seng321-team16/phishguard-trainer/pull/31); reviewed: pending an available teammate PR |
 | Commits | [My commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz) |
+
+**Work completed (Sprint 2)**
+- Pull requests authored:
+  - [#63](https://github.com/seng321-team16/phishguard-trainer/pull/63) docs(qa): update test plan with tooling and NFR verification matrix [T-64]
+- Pull requests reviewed: [#61](https://github.com/seng321-team16/phishguard-trainer/pull/61), [#59](https://github.com/seng321-team16/phishguard-trainer/pull/59)
+- Issues:
+  - [#62](https://github.com/seng321-team16/phishguard-trainer/issues/62) [T-64] Update the test plan with tooling and NFR verification
+- Commits: [all my commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=ygzgemalmaz)
