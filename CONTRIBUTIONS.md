@@ -60,6 +60,26 @@ Evaluated the responsibilities and RACI assignments of all team members (`docs/s
 -Document 05 update: https://github.com/seng321-team16/phishguard-trainer/pull/33
 -Sprint 1 issue tracking: Issue #28, Issue #30
 
+
+**Work completed (Sprint 2):**
+
+- Managed and updated the GitHub Projects Sprint Board, monitoring task progress and moving completed issues to the Done column.
+- Coordinated Sprint 2 task progress, pull request reviews, merge operations and team communication.
+- Reviewed and approved the T-64 Test Plan pull request (#63).
+- Merged the T-61 UML Models pull request (#46) and updated its status on the Sprint Board.
+- Created the T-66 Sprint 2 submission issue (#68) and its feature branch.
+- Prepared the Sprint 2 submission document in Markdown and PDF formats, including team responsibilities, deliverable links, issue and pull request references, review records, Figma prototype links and the planned v0.2.0 release link.
+- Created the T-66 pull request (#75), which was successfully merged into the develop branch.
+- Initiated asynchronous stand-up and retrospective discussions to collect team progress, impediments and improvement suggestions for T-52-S2.
+
+**Contribution evidence:**
+
+- GitHub Projects board: https://github.com/orgs/seng321-team16/projects/1
+- T-61 UML Models merge: https://github.com/seng321-team16/phishguard-trainer/pull/46
+- T-64 Test Plan review: https://github.com/seng321-team16/phishguard-trainer/pull/63
+- T-66 Submission Issue: https://github.com/seng321-team16/phishguard-trainer/issues/68
+- T-66 Submission PR: https://github.com/seng321-team16/phishguard-trainer/pull/75
+
 ## Duhan Kaan Şenol
 
 | Field | Content |
