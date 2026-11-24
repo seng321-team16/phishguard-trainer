@@ -21,7 +21,7 @@ A web-based phishing-awareness **simulator**. Learners judge fictional emails, r
 | `api/` | Backend service and the OpenAPI contract (`api/openapi.yaml`) |
 | `web/` | Web client |
 | `packages/contract/` | TypeScript types generated from the OpenAPI contract |
-| `deploy/` | Docker and docker-compose configuration |
+| `deploy/` | Deployment configuration (nginx); the Compose file is `docker-compose.yml` in the repository root |
 | `docs/` | Project documentation (Sprint 1 deliverables in `docs/sprint-1/`) |
 | `.github/` | Issue and pull request templates, CODEOWNERS, automation |
 
@@ -50,7 +50,24 @@ Configuration comes from environment variables; copy `.env.example` to `.env` wh
 
 ## Running the project
 
-Instructions are added with the first working version (Sprint 3). The target is a single command: `docker compose up`.
+The whole stack (PostgreSQL, API, web) runs with Docker Compose. Only Docker is required (Docker Desktop, or Docker Engine with the Compose plugin).
+
+```bash
+cp .env.example .env          # then replace the change-me values
+docker compose up --build
+```
+
+Open `http://localhost:8080`. The API is reached through the same origin; `GET http://localhost:8080/api/v1/health` returns `{ "status": "ok" }`.
+
+| Service | Image | Role |
+|---|---|---|
+| `db` | `postgres:16-alpine` | Database with a named volume (`db-data`); not published to the host |
+| `api` | built from `api/Dockerfile` | Starts when `db` is healthy; runs `npm run start:prod` (migrations, seed, server) |
+| `web` | built from `web/Dockerfile` | nginx serving the web client on port 8080 and proxying `/api/` to `api`; starts when `api` is healthy |
+
+- Configuration and secrets come only from `.env` (never committed). `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB` must match the values inside `DATABASE_URL`.
+- Stop with `docker compose down`. Add `-v` to delete the database volume as well and start from an empty database next time.
+- Integration tests use a separate, disposable database: `docker compose --profile test up -d db-test` starts PostgreSQL on `localhost:5433` with in-memory (tmpfs) storage; connect with `TEST_DATABASE_URL` from `.env.example`.
 
 ## Contributing
 
