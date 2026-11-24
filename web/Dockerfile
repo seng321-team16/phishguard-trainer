@@ -31,7 +31,8 @@ COPY --from=build /app/web/dist /usr/share/nginx/html
 USER nginx
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+# The first probe runs 1 s after the start (not after the default 5 s), so "compose up --wait" does not idle.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --start-interval=1s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

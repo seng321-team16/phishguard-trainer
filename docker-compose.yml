@@ -22,11 +22,14 @@ services:
       - db-data:/var/lib/postgresql/data
     healthcheck:
       # $$ keeps the variables for the container shell instead of Compose interpolation.
-      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      # -h 127.0.0.1 asks over TCP: the temporary server of the first start (initdb) listens on
+      # the Unix socket only, so a probe during the start period cannot report it as ready.
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 10s
+      start_interval: 1s
 
   api:
     build:
