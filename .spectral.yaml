@@ -1,0 +1,50 @@
+# Spectral ruleset for the API contract (api/openapi.yaml).
+# Run with `npm run lint:api`. Errors fail the command; warnings are printed only.
+extends: ['spectral:oas']
+
+rules:
+  # Built-in rules raised to "error": every operation needs an operationId and at least one tag.
+  operation-operationId: error
+  operation-tags: error
+
+  # Every operation documents at least one client error (4xx) response.
+  operation-4xx-response:
+    description: Every operation must declare at least one 4xx response.
+    message: 'Operation has no 4xx response.'
+    severity: error
+    given: '$.paths[*][get,put,post,delete,patch,options,head,trace].responses'
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          # "not every status code is a non-4xx code" = at least one 4xx code exists
+          not:
+            propertyNames:
+              not:
+                pattern: '^4[0-9X]{2}$'
+
+  # Error responses (4xx and 5xx) carry an RFC 9457 problem document and nothing else.
+  error-response-problem-json:
+    description: Error responses must use the application/problem+json media type only.
+    message: 'Error response must have application/problem+json content (and no other media type).'
+    severity: error
+    given: '$.paths[*][get,put,post,delete,patch,options,head,trace].responses[?(@property.match(/^[45]/))]'
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required: [content]
+          properties:
+            content:
+              type: object
+              required: ['application/problem+json']
+              propertyNames:
+                const: 'application/problem+json'
+
+overrides:
+  # The liveness probe takes no input and needs no token, so it has no client error to document.
+  - files: ['api/openapi.yaml#/paths/~1health/get/responses']
+    rules:
+      operation-4xx-response: 'off'

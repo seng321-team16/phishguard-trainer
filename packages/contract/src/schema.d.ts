@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Liveness probe (no authentication) */
+        /**
+         * Liveness probe (no authentication)
+         * @description Returns a fixed body while the API process is running. Used by Docker health checks; needs no token.
+         */
         get: operations["getHealth"];
         put?: never;
         post?: never;
@@ -30,7 +33,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a learner account */
+        /**
+         * Create a learner account
+         * @description Creates an account with the learner role. The password is never returned. A username or email that is already taken gives 409.
+         */
         post: operations["registerUser"];
         delete?: never;
         options?: never;
@@ -47,7 +53,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Exchange credentials for an access token */
+        /**
+         * Exchange credentials for an access token
+         * @description Checks the username and password and returns a bearer token. An unknown user and a wrong password give the same 401 response.
+         */
         post: operations["login"];
         delete?: never;
         options?: never;
@@ -62,7 +71,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Current user profile */
+        /**
+         * Current user profile
+         * @description Returns the profile of the user the bearer token belongs to.
+         */
         get: operations["getCurrentUser"];
         put?: never;
         post?: never;
@@ -81,7 +93,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Start a training session with a random set of scenarios */
+        /**
+         * Start a training session with a random set of scenarios
+         * @description Creates a session for the caller and returns its scenarios without the answer key. The request body is optional.
+         */
         post: operations["startSession"];
         delete?: never;
         options?: never;
@@ -98,7 +113,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Submit a verdict for one scenario and receive feedback */
+        /**
+         * Submit a verdict for one scenario and receive feedback
+         * @description Records the verdict of the caller for one scenario of their own session and returns the answer key for that scenario.
+         */
         post: operations["submitAnswer"];
         delete?: never;
         options?: never;
@@ -115,7 +133,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Finish the session and get the final score */
+        /**
+         * Finish the session and get the final score
+         * @description Closes a session of the caller and returns the final score. A completed session cannot be completed again.
+         */
         post: operations["completeSession"];
         delete?: never;
         options?: never;
@@ -130,7 +151,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Score history of the current user (newest first) */
+        /**
+         * Score history of the current user (newest first)
+         * @description Returns the completed sessions of the caller, newest first, one page at a time.
+         */
         get: operations["listMyResults"];
         put?: never;
         post?: never;
@@ -147,10 +171,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List all scenarios including answer keys (admin only) */
+        /**
+         * List all scenarios including answer keys (admin only)
+         * @description Returns one page of the scenario library with the answer keys. Requires the admin role.
+         */
         get: operations["adminListScenarios"];
         put?: never;
-        /** Create a scenario (admin only) */
+        /**
+         * Create a scenario (admin only)
+         * @description Adds a scenario to the library. Requires the admin role.
+         */
         post: operations["adminCreateScenario"];
         delete?: never;
         options?: never;
@@ -167,12 +197,21 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Get one scenario with answer key (admin only) */
+        /**
+         * Get one scenario with answer key (admin only)
+         * @description Returns one scenario with its answer key. Requires the admin role.
+         */
         get: operations["adminGetScenario"];
-        /** Replace a scenario (admin only) */
+        /**
+         * Replace a scenario (admin only)
+         * @description Replaces every field of an existing scenario. Requires the admin role.
+         */
         put: operations["adminUpdateScenario"];
         post?: never;
-        /** Delete a scenario (admin only) */
+        /**
+         * Delete a scenario (admin only)
+         * @description Removes a scenario from the library. Requires the admin role.
+         */
         delete: operations["adminDeleteScenario"];
         options?: never;
         head?: never;
@@ -186,7 +225,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Aggregate statistics (admin only) */
+        /**
+         * Aggregate statistics (admin only)
+         * @description Returns totals and the scenarios that learners get wrong most often. Requires the admin role.
+         */
         get: operations["adminGetStats"];
         put?: never;
         post?: never;
@@ -358,6 +400,14 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Unauthorized",
+                 *       "status": 401,
+                 *       "detail": "Invalid credentials"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
@@ -367,6 +417,14 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Forbidden",
+                 *       "status": 403,
+                 *       "detail": "You are not allowed to do this"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
@@ -376,6 +434,14 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Not Found",
+                 *       "status": 404,
+                 *       "detail": "Resource not found"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
@@ -385,17 +451,36 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Conflict",
+                 *       "status": 409,
+                 *       "detail": "Username or email is already in use"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
         /** @description Rate limit exceeded */
         TooManyRequests: {
             headers: {
-                /** @description Seconds until the caller may retry */
+                /**
+                 * @description Seconds until the caller may retry (always a whole number of seconds, never an HTTP date)
+                 * @example 60
+                 */
                 "Retry-After"?: number;
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "type": "about:blank",
+                 *       "title": "Too Many Requests",
+                 *       "status": 429,
+                 *       "detail": "Too many requests, try again later"
+                 *     }
+                 */
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
@@ -553,6 +638,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "type": "about:blank",
+                     *       "title": "Unprocessable Content",
+                     *       "status": 422,
+                     *       "detail": "Not enough scenarios are available for this request"
+                     *     }
+                     */
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
@@ -603,6 +696,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "type": "about:blank",
+                     *       "title": "Conflict",
+                     *       "status": 409,
+                     *       "detail": "This scenario has already been answered"
+                     *     }
+                     */
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
@@ -637,6 +738,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "type": "about:blank",
+                     *       "title": "Conflict",
+                     *       "status": 409,
+                     *       "detail": "This session has already been completed"
+                     *     }
+                     */
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
