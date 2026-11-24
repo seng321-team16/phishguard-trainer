@@ -21,6 +21,33 @@ Each member maintains their own section through a pull request, so that every en
 - Pull requests: authored [#1](https://github.com/seng321-team16/phishguard-trainer/pull/1), [#2](https://github.com/seng321-team16/phishguard-trainer/pull/2); reviewed [#31](https://github.com/seng321-team16/phishguard-trainer/pull/31)
 - Issues: [stories assigned to me](https://github.com/seng321-team16/phishguard-trainer/issues?q=is%3Aissue+assignee%3Adalikaan)
 
+
+**Work completed (Sprint 2)**
+- Pull requests authored:
+  - [#67](https://github.com/seng321-team16/phishguard-trainer/pull/67) feat(db): add users table, initial migration and user repository [T-01]
+  - [#65](https://github.com/seng321-team16/phishguard-trainer/pull/65) build(docker): add multi-stage Dockerfiles and nginx config [T-41]
+  - [#61](https://github.com/seng321-team16/phishguard-trainer/pull/61) build(contract): add Prism mock server and Spectral contract lint [T-48]
+  - [#59](https://github.com/seng321-team16/phishguard-trainer/pull/59) build(compose): add docker compose stack with db, api, web and seeding hook [T-42]
+  - [#46](https://github.com/seng321-team16/phishguard-trainer/pull/46) docs(architecture): add UML use case, class, ER, sequence and state diagrams [T-61]
+  - [#44](https://github.com/seng321-team16/phishguard-trainer/pull/44) docs(architecture): add C4 architecture documentation [T-55]
+  - [#42](https://github.com/seng321-team16/phishguard-trainer/pull/42) build(repo): add npm workspaces skeleton for api, web and contract [T-63]
+  - [#40](https://github.com/seng321-team16/phishguard-trainer/pull/40) docs(adr): add ADRs for stack, API-first contract and JWT auth [T-62]
+- Pull requests reviewed: [#71](https://github.com/seng321-team16/phishguard-trainer/pull/71), [#70](https://github.com/seng321-team16/phishguard-trainer/pull/70), [#57](https://github.com/seng321-team16/phishguard-trainer/pull/57), [#56](https://github.com/seng321-team16/phishguard-trainer/pull/56), [#54](https://github.com/seng321-team16/phishguard-trainer/pull/54), [#52](https://github.com/seng321-team16/phishguard-trainer/pull/52), [#50](https://github.com/seng321-team16/phishguard-trainer/pull/50), [#49](https://github.com/seng321-team16/phishguard-trainer/pull/49), [#48](https://github.com/seng321-team16/phishguard-trainer/pull/48)
+- Issues:
+  - [#66](https://github.com/seng321-team16/phishguard-trainer/issues/66) [T-01] Design the users table and first Prisma migration
+  - [#64](https://github.com/seng321-team16/phishguard-trainer/issues/64) [T-41] Write multi-stage Dockerfiles for api and web
+  - [#60](https://github.com/seng321-team16/phishguard-trainer/issues/60) [T-48] Configure the OpenAPI mock server and contract lint
+  - [#58](https://github.com/seng321-team16/phishguard-trainer/issues/58) [T-42] Write docker-compose configuration with database and seeding hook
+  - [#45](https://github.com/seng321-team16/phishguard-trainer/issues/45) [T-61] Write the UML models
+  - [#43](https://github.com/seng321-team16/phishguard-trainer/issues/43) [T-55] Write the C4 architecture documentation
+  - [#41](https://github.com/seng321-team16/phishguard-trainer/issues/41) [T-63] Create the monorepo skeleton (api, web, contract) with tooling
+  - [#39](https://github.com/seng321-team16/phishguard-trainer/issues/39) [T-62] Record the technology stack and architecture style (ADR-0001)
+  - [#20](https://github.com/seng321-team16/phishguard-trainer/issues/20) [US-18] One-command Docker deployment
+  - [#16](https://github.com/seng321-team16/phishguard-trainer/issues/16) [US-14] Scenario data model and CRUD API
+  - [#4](https://github.com/seng321-team16/phishguard-trainer/issues/4) [US-02] Log in and out
+  - [#3](https://github.com/seng321-team16/phishguard-trainer/issues/3) [US-01] Register an account
+- Commits: [all my commits](https://github.com/seng321-team16/phishguard-trainer/commits?author=dalikaan)
+
 ## Murat Yatağan
 
 | Field | Content |
