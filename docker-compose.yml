@@ -1,0 +1,91 @@
+# PhishGuard Trainer – full stack for local use, the demo and the E2E tests.
+#
+#   cp .env.example .env
+#   docker compose up --build        -> http://localhost:8080
+#   docker compose down -v           -> stops everything and deletes the database volume
+#
+# Start-up order: db (healthy) -> api (migrations, seed, server; healthy) -> web.
+# Only the web container publishes a port; the browser reaches the API through nginx (/api/).
+# Secrets are never stored in this file or in the images: they come from .env (git-ignored).
+
+name: phishguard
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env (cp .env.example .env)}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (cp .env.example .env)}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env (cp .env.example .env)}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # $$ keeps the variables for the container shell instead of Compose interpolation.
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    # Migrations, then seed, then the server. The steps live in the start:prod script of
+    # api/package.json, so later tasks change the script and not this file.
+    command: ['npm', 'run', 'start:prod']
+    volumes:
+      # The API image contains only the compiled code; the start-up script is mounted read-only.
+      - ./api/scripts/start-prod.sh:/app/api/scripts/start-prod.sh:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null "http://127.0.0.1:$${PORT:-3000}/api/v1/health" || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+      start_interval: 2s
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    restart: unless-stopped
+    ports:
+      # nginx runs unprivileged and listens on 8080 inside the container.
+      - '8080:8080'
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Disposable database for the integration tests. Not part of the normal stack:
+  #   docker compose --profile test up -d db-test
+  # Isolated from "db": its own container, its own credentials, a different host port (5433)
+  # and tmpfs storage, so every start is an empty database and nothing is written to disk.
+  db-test:
+    image: postgres:16-alpine
+    profiles: ['test']
+    environment:
+      POSTGRES_USER: phishguard_test
+      POSTGRES_PASSWORD: phishguard_test
+      POSTGRES_DB: phishguard_test
+    ports:
+      - '127.0.0.1:5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U phishguard_test -d phishguard_test']
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  db-data:
